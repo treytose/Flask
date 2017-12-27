@@ -1,0 +1,150 @@
+Notes taken from Flask Web Development by Miguel Grinberg
+
+--------------------------------------------------------------------------------
+-----------------------------Quick Reference------------------------------------
+___Request Hooks___
+@app.before_first_request
+@app.before_request
+@app.after_request
+@app.teardown_request #runs even if an unhandled error occurs.
+
+___Context Globals___
+app.current_app
+app.g #used to store temporary info. reset after every request.
+app.request
+app.session
+
+___Responses___
+Three types of responses
+1. return 'html', status, {http: header}
+2. response = make_response('html')
+   #add more to response obj
+   return response
+3. abort(404) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------
+---------------------___Flask request object___---------------------------------
+from flask import request
+
+request.headers.get('User-Agent')  #returns the name of the browser used to make the request
+
+
+--------------------------------------------------------------------------------
+-------------------------____Request Hooks____----------------------------------
+Decorators used to call functions before and after each request is processed.
+The following are 4 decorators supported by Flask:
+  before_first_request: Register a function to run before the FIRST request is handled.
+  before_request: Register a function to run before EACH request is handled.
+  after_request: Register a function to run after each request
+
+example of after_request:
+    @app.after_request
+    def after_request(response):
+      #Do stuff
+      return response  #You MUST return the response
+    
+   teardown_request: Register a function to run after each request, even if an unhandled exception occurs.
+
+
+---------------------------------Context Globals----------------------------
+Flask uses variables such as 'session' and the 'request' object as if they are
+  global variables. They are however different for each user, in each users thread.
+  Flask achieves this using 'contexts'
+
+  Flask context globals:
+    current_app   Application context     Application instance for the active Application
+    g             Application context     Object that the app can use for temporary storage during a request. reset after each request.
+    request       Request context         encapsulates the contents of a HTTP requests
+    session       Request context         The user session, a dictionary that the app can use to store values that are "remembered" between requests.
+
+    
+    
+----------------------------------Responses---------------------------------
+View functions can take 1, 2, or 3 arguments. An HTML String, Status Code, and a dict of headers for the HTTP response.
+ex:
+    @app.route('/')
+    def index():
+        return 'html string', 200, {'headers': 'for http response'}
+
+
+You can also use Flasks 'make_response()' method to further configure a response
+ex:
+    @app.route('/')
+    def index():
+        response = make_response('<h1> HTML </h1>')
+        response.set_cookie('answer', '42') #sets a cookie in the browser
+        return response
+    
+
+Another type of response called 'redirect()' is used to to a browser to go to a new page, it doesnt return any templates
+#TIP: Redirect HTTP status code = 302
+
+ex:
+    @app.route('/')
+    def index():
+        return redirect('http://www.google.com') #returns a URL, not any HTML
+    
+    
+Lastly, there is the 'abort(status_code)' response, this response raises an exception to the web server.
+
+ex:
+    @app.route('login/<int:id>')
+    def login():
+        user = load_user(id)
+        if not user:
+            abort(404) #aborts the request, returns 404 not found status.
+        return user #if not aborted, returns user
+    
+    
+
+---------------------------------------------------------------------------------------------------------------------
+---------------------------------------Jinja2 Template Engine--------------------------------------------------------
+You can pass any type (lists, dictionaries, objects, etc.) of variable in 'render_template()' to be used with Jinja2
+
+ex:
+    @app.route('/')
+    def index():
+        return render_template('index.html', user=g.get('user')) #passing an object 
+    
+    
+    #In the Jinja2 template:
+    <h1> Hello {{ user.username }} </h1> #accessing the objects username
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
