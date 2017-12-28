@@ -1,7 +1,8 @@
 Notes taken from Flask Web Development by Miguel Grinberg
 
 --------------------------------------------------------------------------------
------------------------------Quick Reference------------------------------------
+---------------------------- Quick Reference -----------------------------------
+--------------------------------------------------------------------------------
 ___Request Hooks___
 @app.before_first_request
 @app.before_request
@@ -23,10 +24,573 @@ Three types of responses
 3. abort(404) 
 
 
+-----------------------------____Jinja2____------------------------------------
+
+___Variables___
+- variables pass through render_template()
+- any type of variable can be passed through (objects, lists, dicts, etc.)
+- In the template, access variables with {{ var_name }}
+
+___Filters___
+use the '|' (pipe) after a Jinja2 variable, followed by the filter name.
+example:
+    {{ user.username|capitalize }}
+    
+common filter names:
+    safe - Renders the value without applying escaping
+    capitalize
+    lower
+    upper
+    title
+    trim - Removes trailing whitespace
+    striptags - Removes any HTML tags
+    #Not the complete list
+    
+    
+___Macros___
+
+quick example:
+    {% import 'macros.html' as macros %} #import a macro template
+    
+    {% macro render_comment(comment) %} #create a macro, takes in 1 arg 'comment'
+        <li> {{comment}} </li>
+    {% endmacro %}
+    
+    {% for comment in comments %}
+        {{render_comment(comment)}} #example of using the macro.
+    {% endfor %}
+    
+    
+___ Includes ___
+Useful for segments of HTML that are repeated, like a navbar.
+
+{% include 'navbar.html' %} #includes this template in this spot
 
 
+___ Template Inheritance ____
+
+reference example:
+    
+    base.html:
+        
+        <html>
+        <head>
+            {% block head %}
+                <title> {%block title %} {% endblock %} - My Applications </title>
+            {% endblock %}
+        </head>
+        <body>
+            {% block body %}
+            {% endblock %}
+        </body>
+        </html>
+        
+    example template:
+        
+        {% extends 'base.html' %}
+        
+        {% block title %} Template Title {% endblock %} #Adds contents only to the 'title' block
+        
+        {% block head %}
+            {{ super() }} #*.*.*.* - calling super() renders the HTML in the parent template! - *.*.*.*
+            #head stuff
+        {% endblock %}
+        
+        {% block body %}
+            <h1> Hello World! </h1>
+        {% endblock %}
+        
+
+    
+----------------------------- ___ Twitter Bootstrap ___ ------------------------------------
+- Install - pip install flask-bootstrap
+- Import -- from flask_bootstrap import Bootstrap
+- Init ---- bootstrap = Bootstrap(app)
+
+Flask-Bootstrap uses Jinja2 and has a 'base.html' template which includes all bootstrap files.
+There are several 'Blocks' that can be overridden such as 'navbar', 'title', 'content', etc.
+
+In a template:
+    {% extends 'bootstrap/base.html' %}
+    
+    {% block navbar %}
+        #navbar
+    {% endblock %}
+    
+    {% block content %}
+        <div class="container"> #use bootstrap classes as normal
+            #stuff
+        </div>
+    {% endlbock %}
+    
+
+List of Common Blocks:
+    Block Name    |      Description
+    --------------------------------
+    doc -           Entire HTML document
+    html_attribs -  HTML attributes
+    html -          <html> contents </html>
+    head
+    title
+    metas
+    styles
+    body_attribs
+    body
+    navbar
+    content
+    scripts
+    #Not the full list
+    
+    #NOTE: overriding some blocks may cause issues if you don't call {{ super() }} e.g. the scripts block contains BS files
+    
+-------------------------------------------------------------------------------------------------------------------------
+----------------------------------------- Custom Error Pages, pg 28 --------------------------------------------------
+    
+The two most common HTTP errors are 404 not found and 500 internal server error.
+
+Using custom error templates, example:
+    
+    @app.errorhandler(404)
+    def page_not_found(e): #e contains the error information
+        return render_template('404.html'), 404
+    
+    
+---------------------------------- Links -------------------------------------------
+use 'url_for()' for custom links
+
+example:
+    @app.route('/user/<name>')
+    def user(name):
+        return something
+    
+    url_for('user', name='Bob') #returns the URL '/user/Bob'
+    
+    @app.route('/')
+    def index():
+        return something
+    
+    url_for('index', page=2) #returns the URL '/index?page=2'
+    
+    
+    
+---------------------------------- Static Files -------------------------------------------
+In Jinja2 templates, access static files in the static folder using 'url_for()'
+
+example:
+    #This looks for the styles.css file in the /static/css/ directory
+    {{ url_for('static', filename='css/styles.css') }}
+    
+    
+---------------------------------- Flask-Moment -------------------------------------------
+Flask-Moment is used to localize dates and times for users in different time zones
+
+Note: UTC (Universal Time Coordination) time is typically used by programs as it is not dependent on location,
+        but is not visually appealing to most users.
+        
+Note: Browsers are good at converting to local time as they have access to the computers locale. A good JavaScript library 
+        for doing this is 'momentjs'. 
+
+Flask-Moment integrates moment.js into Jinja2 templates.
+
+- Install - pip install flask-moment
+- import -  from flask_moment import Moment
+- init -    moment = Moment(app)
+
+- Dependencies - JQuery and Moment.js are required to use flask-moment in your templates
+    #NOTE: JQuery is included with flask-bootstrap
+
+    You can access a CDN to moment.js through flask-moment using the 
+    following include statement in your templates scripts block:
+
+        {{ moment.include_moment() }}
 
 
+- Pass in the current UTC time
+    
+    from datetime import datetime
+    
+    @app.route('/')
+    def index():
+        #datetime.utcnow() returns the current universal time which flask-moment will use when rendering local time.
+        return render_template('index.html', current_time=datetime.utcnow())
+    
+    
+
+- Display the time in your templates:
+    
+    <p> The local date and time is {{ moment(current_time).format('LLL') }} </p>
+    <p> That was {{ moment(current_time).fromNow(refresh=True) }} </p>
+    
+    #Note: LLL is formatting the time according to the clients computer, the amount of Ls determines the
+        # verbosity level from L to LLLL
+
+    Moment can be formatted to show several different things. See https://momentjs.com/docs/ for a full list.
+        e.g. moment(current_time).format('YYYY') would display 2017
+        
+    The 'fromNow()' method shows how much time 'ago' the page was rendered and keeps it refreshed.
+    e.g. if it was updated 1 minute ago it displays: That was 'a minute ago'
+        
+        
+    
+---------------------------------------- Web Forms with Flask-WTF -------------------------------------------
+
+Flask-WTF makes generating HTML code and form validation much easier.
+
+- installation:
+    pip install flask-wtf
+
+--CSRF (Cross-Site Request Forgery) Protection--
+People can set up forms to send a victims submitted form data to another website, stealing their information.
+Flask-WTF by default protects against all forms of CSRF.
+
+Flask-WTF prevents CSRF by using encrypted tokens to verify the authenticity of requests with form data. However, in 
+    order to do this, Flask-WTF needs an encryption key.
+
+- Configure the encryption key:
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = 'hard to guess string'
+    
+
+___ Form Classes ___
+
+- imports:
+    from flask_wtf import FlaskForm
+    from wtforms import StringField, SubmitField
+    from wtforms.validators import Required
+    
+    
+- Create a Form Class:
+    class NameForm(FlaskForm):
+        name = StringField('What is your name?', validators=[Required()])
+        submit = SubmitField('Submit')
+        
+        
+    flask-wtf form fields:
+        StringField
+        TextAreaField
+        PasswordField
+        HiddenField
+        DateField
+        DateTimeField
+        IntegerField
+        DecimalField
+        FloatField
+        BooleanField
+        RadioField
+        SelectField
+        SelectMultipleField
+        FileField
+        SubmitField
+        FormField
+        FieldList
+        
+        
+        
+    flask-wtf validators:
+        Email
+        EqualTo
+        IPAddress
+        Length
+        NumberRange
+        Optional
+        Required
+        Regexp
+        URL
+        AnyOf
+        NoneOf
+                
+    
+- Rendering the Form:
+    <form method="POST">
+        {{ form.csrf_token }} # *.*.* MUST include the csrf_token or form.validate_on_submit() will ALWAYS return False *.*.*
+        {{ form.name.label }} {{ form.name() }}
+        {{ form.submit() }}
+    </form>
+    
+    #NOTE: You can pass HTML attributes into the form fields arguments:
+         form.name(id='my-text-field') #this gives the form field an id so that you can alter the CSS attributes.
+    
+-- Using Flask-Bootstrap to EASILY style the entire form:
+    {% import 'bootstrap/wtf.html' as wtf %}
+    {{ wtf.quick_form(form) }}
+    
+
+#NOTE: Never leave a website with it's last request being a POST request, it will create a 'usability' issue where it won't refresh correctly. Instead of returning a template, return a 'redirect' when a POST request is sent.
+
+
+___ Flashing ___
+A built in flask function is given to display messages to the user.
+
+- import:
+    from flask import Flask
+
+- Flash a message:
+    flash('Invalid username or password')
+     
+- Render in a Jinja2 template:
+    <h1> Message: {% get_flashed_messages()[0] %} </h1> #get_flashed_messages() returns a list of all flashed messages.
+    
+
+-----------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------- Databases --------------------------------------------------------------
+Relational Databases - Contain seperate tables that are related to eachother by foreign keys. MySQL is a relational DB
+
+
+---------------------------------------------------- Flask SQLAlchemy -------------------------------------------------------
+
+- installation:
+    pip install flask-sqlalchemy
+    
+- import:
+    from flask_sqlalchemy import SQLAlchemy
+    
+-- Flask-SQLAlchemy databases are specified as URLs, use the associated URL to use a specific database engine:
+    Database Name -  URL
+    --------------------
+    MySQL -          mysql://username:password@hostname/database
+    Postgres -       postgresql://username:password@hostname/database
+    SQLite (Unix) -  sqlite:////absolute/path/to/database
+    SQLite (Win)  -  sqlite:///c:/absolute/path/to/database
+            
+    #FYI: @hostname refers to the server that hosts the MySQL service, either localhost or a remote server
+    
+     
+- Configure a SQLite3 database:
+    app = Flask(__name__)
+    
+    #Set equal to the necessary database URL as listed above
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////absolute/path/to/database.db'
+    app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True #automatically commits changes per request
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+- Init the database object:
+    db = SQLAlchemy(app)
+    
+
+- Create Models:
+    Models are python classes that inherit from db.Model, the class attributes are the columns of coresponding table,
+    
+    Common SQLAlchemy column types:
+        Type Name - Python Type - Description
+        -------------------------------------
+        Integer
+        BigInteger- int or long
+        Float -     
+        Numeric -   decimal.Decimal - Fixed-point number
+        String
+        Text - string - Best for large or unbound-length strings
+        Date - datetime.date 
+        Time - datetime.time
+        DateTime - datetime.datetime
+        Boolean - bool
+        Enum - str - List of string values
+        #Note: not all types are listed here, see full list on Flask-SQLAlchemy documentation
+        #Usage: In Python class, var_name = db.Column(db.TypeName, columnOptions)
+        
+    Common SQLAlchemy Column Options:
+        Option name - Description
+        -------------------------
+        primary_key - If set to True, sets column to the tables primary key
+        unique      - If set to True, does not allow duplicate values for this column
+        index       - If set to True, create an index for this column, so that queries are more efficient
+        nullable    - If set to True, allows empty values for this column.
+        default     - Defines a default value for this column if one is not given.
+        
+        
+    
+    class Role(db.Model):
+        __tablename__ = 'roles'  #define the table
+        
+        id = db.Column(db.Integer, primary_key=True) #create an auto-incrementing id column
+        name = db.Column(db.String(64), unique=True) #create a string column, max 64 chars, no duplicate values allowed.
+        
+        def __repr__(self):
+            return '<Role %r>' % self.name  #the __repr__ string is returned when printing, used for debugging.
+
+    class User(db.Model):
+        __tablename__ = 'users'
+        id = db.Column(db.Integer, primary_key=True)
+        username = db.Column(db.String(64), unique=True, index=True)
+        
+        def __repr__(self):
+            return '<User %r>' % self.username
+        
+    
+-- Relationships, pg. 56:
+    relationships are used to connect certain rows accross different tables.
+    
+    In this example, a 'Role' will belong to multiple 'Users', this is called a one-to-many relationship
+    
+-Add a relationship between the 'Role' and the 'User':
+    class Role(db.Model):
+        __tablename__ = 'roles'
+        # ...
+        #This will represent all 'User' instances associated with a role
+        users = db.relationship('User', backref='role') #this allows a User to access it's role by calling User.role
+         
+    class User(db.Model):
+        __tablename__ = 'users'
+        # ...
+        #Creates a column named 'role_id' that is an Integer, and is equal to an 'id' row in the 'roles' table
+        role_id = db.Column(db.Integer, db.ForeignKey('roles.id')) 
+        
+        
+-Create the Tables:
+    For the initial time creating the tables, you can use the python shell
+    
+    >>> from app import db
+    >>> db.create_all()
+    
+    If succesful the 'data.db' filename should have been created.
+    
+    #NOTE: if you change the models, create_all() will not re-create the tables, use the following to re-create them:
+    #WARNING: ALL DATA WILL BE LOST UPON USING THIS METHOD, SEE DIFFERENT METHODS IF YOU NEED TO KEEP THE DATA
+    >>> db.drop_all()
+    >>> db.create_all()
+    
+-Insert Rows:
+    Example of inserting rows in the python shell, notice that the kwargs passed match the tables column names
+    
+    >>> from app import Role, User, db
+    >>> admin_role = Role(name='Admin')
+    >>> admin_user = User(username='Trey', role=admin_role)
+
+    Now add the created 'Role' and 'User' objects to the database:
+    
+    >>> db.session.add(admin_role)
+    >>> db.session.add(admin_user)
+    >>> db.session.commit()
+    
+    Test:
+    >>> admin_user.role  #returns the __repr__ methods value: <Role Admin>
+    >>> admin_user.role.name #returns 'Admin'
+    
+    
+- Modifying Rows:
+    >>> admin_role.name = 'Administrator'
+    >>> db.session.add(admin_role)
+    >>> db.session.commit()
+    
+    This changes the admin_roles name to 'Administrator', and will now be updated for all 'Users' using that role
+    so:
+    
+    >>> admin_user.role.name #Now returns 'Administrator'
+    
+- Deleting Rows:
+    >>> db.session.delete(admin_role)
+    >>> db.session.commit() 
+    
+    This removes the admin_role row from the 'Roles' table
+
+- Querying Rows:
+    Return contents of entire table as a list:
+        >>> Role.query.all()
+        >>> User.query.all()
+        
+    Filters are used to get more specific query results:
+        >>> User.query.filter_by(role=admin_role).all()
+        
+    Query the 'rows' table that returns a Role object:
+        >>> admin_role = Role.query.filter_by(name='Administrator').first()
+        
+    #NOTE: Multiple filters can be applied in sequence until the query is configured as needed
+    
+    Common SQLAlchemy filters:
+        filter() -     Returns a query that adds an additional filter to the original query
+        filter_by()    Returns a query that adds an additional equality filter to the original query
+        limit()
+        offset()
+        order_by()
+        group_by()
+        
+    You can then select the amount of results to retrieve after filters are applied:
+        all()
+        first()
+        first_or_404()
+        get()           - Returns the row that matches the given priary key, or None if not found
+        get_or_404()
+        count()         - Returns the result count of the query
+        paginate()      
+        
+    
+- Querying Relationships:
+    >>> users = user_role.users
+    >>> users #returns all users with the 'user' role
+    same as
+    >>> Role().query.filter_by(name='user').first().users.all() #This works if lazy='dynamic' described below
+    
+    However, filters cannot be applied to this query because all() is called internally.
+    To prevent this, add the lazy='dynamic' argument to the db.relationship() method in 'Role'
+    
+    class Role(db.Model):
+        # ...
+        users = db.relationship('User', backref='role', lazy='dynamic')
+        # ...
+        
+        
+    Filters may now be added to it:
+        >>> user_role.users.order_by(User.username).all() #return all users with the 'user' role in alphabetical order
+        same as
+        >>> Role.query.filter_by(name='user').first().users.all()
+
+
+    And to get the 'Role' of a 'User':
+        >>> User.query.first().role  #returns the 'Role' object of the first user in the 'users' table
+        
+    -------------------------------------------------------------------------------------------------------------------
+    __Database Migrations with Flask-Migrate__
+    
+    Database models may need to change, SQLAlchemy only creates tables from models if they dont exists already.
+    So the only way to change your model is to destroy the table and then re-create it, losing all the data in the process.
+    
+    Flask-Migrate allows you to change your SQLAlchemy models without losing all of your data.
+    This is used in combination with Flask-Script, a library for passing command line arguments into your flask application.
+    
+    To read about this see page 64.
+    
+    --------------------------------------------------------------------------------------------------------------------
+    -------------------------------------- Chapter 6, Email with Flask-Mail --------------------------------------------
+    
+    - Installation:
+        pip install flask-mail
+        
+    - Import:
+        from flask_mail import Mail
+        
+        
+    Flask-Mail SMTP server cofiguration keys:
+        Key           - Default   - Description
+        -------------------------------------------------------------------
+        MAIL_HOSTNAME - localhost - Hostname or IP addr of the email server
+        MAIL_PORT     - 25        - Port of the email server
+        MAIL_USE_TLS  - False     - Enable Transport Layer Secutiy (TLS) security
+        MAIL_USE_SSL  - False     - Enable Secure Socket Layer (SSL) security
+        MAIL_USERNAME - None      - Mail account username
+        MAIL_PASSWORD - None      - Mail account password
+        
+        
+    Example configuration for sending Emails through a 'Gmail' account:
+        app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+        app.config['MAIL_PORT'] = 587
+        app.config['MAIL_USE_TLS'] = True
+        app.config['MAIL_USE_SSL'] = False
+        
+        #NOTE: You should NEVER put your credentials directly in your code. Set them as an OS environmental variable
+        #NOTE: On centOS7 you can do this by entering the following commands in the terminal:
+            # export MAIL_USERNAME="johndoe@gmail.com"
+            # test it worked: echo $MAIL_USERNAME
+        app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME') #import os
+        app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+
+
+        #TROUBLESHOOTING: Make sure Allow Less Secure Apps is turned on in your GMAIL settings.
+        #If it still gives you an SMTP AUTH error, try going here:  https://accounts.google.com/DisplayUnlockCaptcha
+
+
+    - Init:
+        mail = Mail(app)
+        
+    
 
 
 
