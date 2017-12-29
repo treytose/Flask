@@ -132,6 +132,6 @@ def flask_mail_example():
         return redirect(url_for('flask_mail_example'))
 
     return render_template('flask_mail_example.html', form=form)
-
+#
 if __name__ == '__main__':
     app.run(port=80, host='0.0.0.0', debug=True)
