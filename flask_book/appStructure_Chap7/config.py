@@ -28,10 +28,14 @@ class DevelopmentConfig(Config):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URI') or \
         'sqlite:///' + os.path.join(basedir, 'data.db')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    PORT = 80
+    HOST = '0.0.0.0'
 
 
 class TestingConfig(Config):
     TESTING = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data.db')
 

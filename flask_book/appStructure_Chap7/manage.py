@@ -7,5 +7,5 @@ config_mode = os.getenv('FLASK_CONFIG') or 'default'
 app = create_app(config_mode)
 
 if __name__ == '__main__':
-    print('Running app in ' + config_mode + '.')
+    print('Running app in config mode: ' + config_mode)
     app.run(host='0.0.0.0', port=80)

@@ -46,14 +46,6 @@ def page_not_found(e):
 def momentExample():
     return render_template('momentExample.html', current_time=datetime.utcnow())
 
-@app.route('/flask_wtf_example', methods=['POST', 'GET'])
-def flask_wtf_example():
-    form = NameForm()
-    if form.validate_on_submit():
-        session['name'] = form.name.data
-        return redirect(url_for('flask_wtf_example'))
-
-    return render_template('flask_wtf_example.html', name=session.get('name'), form=form)
 
 @app.route('/', methods=['GET'])
 def index():
@@ -64,6 +56,15 @@ def index():
 class NameForm(FlaskForm):
     name = StringField('What is your name?', validators=[Required()])
     submit = SubmitField('Submit')
+
+@app.route('/flask_wtf_example', methods=['POST', 'GET'])
+def flask_wtf_example():
+    form = NameForm()
+    if form.validate_on_submit():
+        session['name'] = form.name.data
+        return redirect(url_for('flask_wtf_example'))
+
+    return render_template('flask_wtf_example.html', name=session.get('name'), form=form)
 
 #------------------- Flask SQLAlchemy -----------------
 class Role(db.Model):

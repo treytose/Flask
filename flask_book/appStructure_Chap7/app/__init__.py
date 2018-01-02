@@ -20,7 +20,7 @@ def create_app(config_name):
     moment.init_app(app)
     db.init_app(app)
 
-    from main import main as main_blueprint #imported here to prevent circular imports
+    from app.main import main as main_blueprint #imported here to prevent circular imports
     app.register_blueprint(main_blueprint)
 
     return app
