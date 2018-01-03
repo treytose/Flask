@@ -1,0 +1,51 @@
+Blueprints:
+    the render_template() method searches the 'apps' template folder first and THEN searches the blueprints template folder if specified.
+    
+imports:
+    'from . import package' the dot means python will search the current package and THEN the PYTHONPATH for the import.
+    
+url_for:
+    when working in blueprints in the views.py files 
+        use .<routeName> to refer to a route defined in the same blueprint
+        use <package>.<routeName> to refer to a different blueprints route
+    
+    
+SQLAlchemy:
+    When creating a Model, don't define an __init__ method!!! It will make it where you can create an object with the column values
+    
+    Chapter 7+, how to create the SQLAlchemy tables:
+        Open python terminal
+        >>> from app import create_app, db
+        >>> from app.models import User, Role
+        >>> app = create_app('default')
+        >>> app.app_context().push()  #have to do this for some reason, same as doing 'with app.app_context():'
+        >>> db.create_all()
+        
+        Then if you want to add data:
+        >>> admin_role = Role(name='Admin')
+        >>> admin_user = User(username='Trey', role=admin_role)
+        >>> db.session.add(admin_role)
+        >>> db.session.add(admin_user)
+        >>> db.session.commit()
+    
+@property:
+    @property is used in python to provide getters and setters:
+    ex:
+        class Temperature:
+            def __init__(self, temperature=0):
+                self.temperature=temperature
+                
+            @property
+            def temperature(self):
+                return self.temperature
+               
+            @temperature.setter
+            def temperature(self, temperature):
+                if temperature > 0:               #using the setter we can make sure nobody sets the temperature above 0
+                    self.temperature = temperature
+                else:
+                    # raise error here
+                    
+          temp = Temperature()
+          temp.temperature = 5  #this calls the setter
+          temp.temperature = -4 #this will not set the temperature because it must be above 0

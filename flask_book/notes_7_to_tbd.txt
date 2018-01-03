@@ -1,0 +1,213 @@
+-------------------------------------------------------------------------------------------------------------------------
+---------------------------------------- Chapter 7 Large Application Structures -----------------------------------------
+
+An example of a Flask application structure:
+    |-Flask
+        |-app/
+            |-templates/    
+            |-static/
+            |-main/
+                |-__init__.py #inits this package as a flask Blueprint and also includes some imports.
+                |-errors.py   #contains routes for error handling
+                |-forms.py    #contains the WTForm classes
+                |-views.py    #contains all the routes for different website views.
+            |-__init__.py     #imports, creates, and inits all the Flask Extensions and also contains the create_app(config_name) method
+            |-email.py        #handler for emails
+            |-models.py       #models for SQLAlchemy
+        |-migrations/         #scripts for migrating between databases.
+        |-tests/              #directory for Unit Testing
+            |-__init__.py
+            |-test*.py
+        |-requirements.txt    #text file that contains a list of all the dependencies for this application, extensions etc.
+        |-config.py           #file containing configuration classes
+        |-manage.py           #file that starts the app, run the app with 'python3.6 manage.py' or ./manage.py
+        
+        
+!  See the 'application structure' directory for an example layout with example code. 
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------- Chapter 8 --- Part II --- A social blogging application---------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------- User Authentication - Flask-Login-------------------------------------------
+-install:
+    pip install flask-login
+    
+-import:
+    from flask_login import UserMixin #import in the models file so your models can extend the UserMixin class
+    from flask_login import LoginManager #import in app's __init__.py file so instantiate the LoginManager with the app
+    
+-Prepare the User model for Logins:
+    User model needs the following methods to be implemented:
+        is_authenticated() #returns True if user has login credentials
+        is_active() #returns True if the user is allowed to log in
+        is_anonymouse() #returns False for regular users
+        get_id() #returns a unique identifier for the user, encoded as Unicode string
+        
+     Use Flask-Logins 'UserMixin' class to implement the above methods:
+        
+        class User(UserMixin, db.Model):
+            __tablename__ = 'users'
+            email = db.Column(db.String(64), unique=True, index=True)
+            username = db.Column(db.String(64), unique=True, index=True)
+            password_hash = db.Column(db.String(128))
+            role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+            
+            
+-Instantiate LoginManager:
+    in app/__init__.py:
+        
+        login_manager = LoginManager()
+        login_manager.session_protection = 'strong' #None, basic, or strong. At strong, if a user changes IP's it logs them out
+        login_manager.login_view = 'auth.login' #the page users will be sent if not authenticated and trying to access auth pages.
+        
+        def create_app(config_name):
+            # ...
+            login_manager.init_app(app)
+            
+            
+-Create a callback function for Flask_Login to turn an ID into a User object:
+    in app/models.py:
+        
+        @login_manager.user_loader
+        def load_user(user_id):
+            return User.query.get(int(user_id))
+        
+        
+__Protecting Routes__:
+    How to protect certain routes so that only logged in users can access them with Flask-Login
+    
+    from flask_login import login_required
+    
+    @app.route('/exampleRoute')
+    @login_required
+    def secret():
+        return 'Only authenticated users are allowed'
+        
+        
+___Adding a Login Form___
+    See WTF_Forms in chap 1-6 notes
+    
+    
+__Add Sign in and Sign out options on navbar__
+<ul class="nav navbar-nav navbar-right">
+    {% if current_user.is_authenticated %} #in the book 'is_authenticated' is a method, but now its just an attribute so don't use '()'
+    <li><a href="{{url_for('auth.logout') }}"> Sign Out </a></li>
+    {% else %}
+    <li><a href="{{ url_for('auth.login') }}"> Sign In </a> </li>
+    {% endif %}
+</ul>
+    
+ NOTE: The 'current_user' variable is automatically available in view functions and templates with Flask-Login
+ 
+ 
+ ___Signing Users In___
+ @auth.route('/login', methods=['GET','POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user is not None and user.verify_password(form.password.data):
+            login_user(user, form.remember_me.data)
+            return redirect(url_for('main.secret'))
+        flash('Invalid Username or Password')
+    return render_template('auth/login.html', form=form)
+
+
+___Signing Users Out___
+@auth.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out')
+    return redirect(url_for('main.index'))
+
+
+___Using the User object in templates___
+{{ current_user }} #automatically available in the tempalates and view functions. Returns the current user's User object
+
+
+___ Registering Users ___
+@auth.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+
+    if form.validate_on_submit():
+        user = User(email=form.email.data, username=form.username.data,
+                    password=form.password.data)
+        db.session.add(user)
+        flash('Registration Successful')
+        return redirect(url_for('.login'))
+    return render_template('auth/register.html', form=form)
+
+    
+__ Account Confirmation __
+We will send an email with an encrypted confirm token using 'itsdangerous'
+
+Example of itsdangerous in shell:
+    >>> from manage import app
+    >>> from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+    >>> s = Serializer(app.config['SECRET_KEY'], expires_in=3600)
+    >>> token = s.dumps({'confirm': 23})
+    >>> token #returns a long string
+    >>> data = s.loads(token)
+    >>> data #returns a dictionary with {'confirm': 23}
+    
+    
+in app/models.py:
+    -import:
+        from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+        from flask import current_app #needed to get the SECRET_KEY value
+        
+    -add to the User class:
+    
+        User(UserMixin, db.Model):
+            # ...
+            
+            confirmed = db.Column(db.Boolean, default=False) #tells us if this user has confirmed their email or not
+            
+            # ...
+
+            def generate_confirmation_token(self, expiration=3600):
+            s = Serializer(current_app.config['SECRET_KEY'], expiration)
+            return s.dumps({'confirm': self.id}) #s.dumps returns an encrypted string
+
+            def confirm(self, token):
+                s = Serializer(current_app.config['SECRET_KEY'])
+                try:
+                    data = s.loads(token)
+                except:
+                    return False
+                if data.get('confirm') != self.id:
+                    return False 
+                self.confirmed = True 
+                db.session.add(self) #changed confirmed column val, re-enter in db
+                return True
+
+
+
+-Testing confirmation tokens: (Added to user_model_test)
+
+def test_confirmation_token(self):
+        app = create_app('testing')
+        app.app_context().push()
+        u = User()
+        token = u.generate_confirmation_token(60)
+        self.assertTrue(u.confirm(token))
+
+    
+-Sending Confirmation Emails:
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+        
+
+        
