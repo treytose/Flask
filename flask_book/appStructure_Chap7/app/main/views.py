@@ -4,10 +4,10 @@ from . import main
 from .forms import NameForm
 from .. import db
 from ..models import User
+from flask_login import login_required
 
-@main.route('/', methods=['Get', 'POST'])
+@main.route('/', methods=['GET', 'POST'])
 def index():
-    print('Index Requested!')
     form = NameForm()
     if form.validate_on_submit():
         session['name'] = form.name.data
@@ -15,3 +15,9 @@ def index():
     return render_template('index.html', form =form, name=session.get('name'), #e.g. here .index is the same as: main.index
                             known=session.get('known', False),
                             current_time=datetime.utcnow())
+
+
+@main.route('/secret')
+@login_required
+def secret():
+    return 'Secret template!'

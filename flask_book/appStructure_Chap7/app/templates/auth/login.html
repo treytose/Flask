@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1> Hello, Welcome to Login.html! </h1>
+  {% set messages = get_flashed_messages() %}
+  {% if messages %}
+  <p> {{ messages[0] }} </p>
+  {% endif %}
+
+  {% import 'bootstrap/wtf.html' as wtf %}
+  {{ wtf.quick_form(form) }}
+  <p>
+    New User?
+    <a href="{{ url_for('auth.register') }}">
+      Click here to register
+    </a>
+  </p>
+</div>
+{% endblock %}
