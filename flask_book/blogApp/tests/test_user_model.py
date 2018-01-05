@@ -1,6 +1,7 @@
 import unittest
-from app.models import User
+from app.models import User, Permission, Role, AnonymousUser
 from app import create_app, db
+
 
 class UserModelTestCase(unittest.TestCase):
     def test_password_setter(self):
@@ -28,3 +29,13 @@ class UserModelTestCase(unittest.TestCase):
         u = User()
         token = u.generate_confirmation_token(60)
         self.assertTrue(u.confirm(token))
+
+    def test_roles_and_permissions(self):
+        Role.insert_roles()
+        u = User(email='john@example.com', password='cat')
+        self.assertTrue(u.can(Permission.WRITE_ARTICLES))
+        self.assertFalse(u.can(Permission.MODERATE_COMMENTS))
+
+    def test_anonymous_user(self):
+        u = AnonymousUser()
+        self.assertFalse(u.can(Permission.FOLLOW))

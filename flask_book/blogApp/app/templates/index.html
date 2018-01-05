@@ -12,7 +12,9 @@
     {% endif %}
   </h1>
 
-
+  {% if flashes %}
+    {{ flashes[0] }}
+  {% endif %}
   {{ wtf.quick_form(form) }}
 </div>
 {% endblock %}

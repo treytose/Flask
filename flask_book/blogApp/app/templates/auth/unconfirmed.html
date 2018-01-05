@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1> Your account has not been confirmed yet. </h1>
+  <p> Please check your email for a confirmation link. </p>
+  <p> Don't see an email? Click <a href="{{url_for('auth.resend_confirmation') }}"> here </a> to re-send the confirmation email </p>
+</div>
+{% endblock %}

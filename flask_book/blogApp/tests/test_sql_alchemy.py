@@ -17,8 +17,8 @@ class SQLAlchemyTestCase(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
+        #db.session.remove() #NOTE: causes test_runner to fail, dropping tables before other tests are run.
+        #db.drop_all()
         self.app_context.pop()
 
     def test_user_table_exists(self):
