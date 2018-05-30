@@ -49,3 +49,19 @@ SQLAlchemy:
           temp = Temperature()
           temp.temperature = 5  #this calls the setter
           temp.temperature = -4 #this will not set the temperature because it must be above 0
+          
+[Unit]
+Description=Gunicorn instance to serve Analytics API (python3)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/vol1/apps/analytics/web/
+#ExecStart=/usr/local/bin/python3.6 /usr/local/bin/gunicorn -w 2 -b 0.0.0.0:5037 __init__:app
+ExecStartPre =/bin/mkdir -p /var/run/analytics
+ExecStart=/usr/local/bin/python3.6 /usr/local/bin/gunicorn __init__:app --workers 3 --threads 16 -b 0.0.0.0:5037 --pid /var/run/analytics/analyticsapi.pid --access-logfile /var/log/appserver/analyticsapi-access.log --error-logfile /var/log/appserver/analyticsapi-error.log --reload
+PIDFile=/var/run/analytics/analyticsapi.pid
+
+[Install]
+WantedBy=multi-user.target
