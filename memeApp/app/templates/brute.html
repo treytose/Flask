@@ -1,0 +1,50 @@
+<html>
+	<head>
+
+	</head>
+	<body>
+		<input id="pass" type="password">
+		<button id="crackButton" type="button"> Crack </button>
+		<h1 id="message"> Enter password to brute force crack </h1>
+		<script>
+			var password = "a";
+			var chars = ["a","b","c","d","e","f","g","h","i",'j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9'];
+
+			document.getElementById("crackButton").addEventListener("click", function() {
+				 password = document.getElementById("pass").value;
+				crack();
+			});
+			function crack(sequence=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], length=1, current=0) {
+				var newAttempt = "";
+				for(var i = 0; i < length; i++) {
+					newAttempt += chars[sequence[i]];
+				}
+
+				if(sequence[current] >= chars.length) {
+					sequence[current] = 0;
+					length++;
+					
+					for(var i = 0; i < length; i++) {
+						if(sequence[i] < chars.length) {
+							sequence[i]++;
+							break;
+						} else {
+							
+						}
+					}
+				}
+
+				attempt(newAttempt);
+				console.log(newAttempt);
+			}
+			
+			function attempt(newAttempt) {
+				if(newAttempt == password) {
+					return true;
+				} 
+				return false;
+			}
+		
+		</script>
+	</body>
+</html>
