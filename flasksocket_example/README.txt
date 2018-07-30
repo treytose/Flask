@@ -1,3 +1,5 @@
+A simple flask application to demonstrate the usage of the Flask-SocketIO extension.
+
 Usage:
   python3.6 app.py
   
