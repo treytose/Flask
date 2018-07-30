@@ -1,0 +1,14 @@
+<html>
+	<head>
+
+	</head>
+	<body>
+		<h3> Flask WTForm Example </h3>
+		<form method="POST" action="/">
+			{{ form.csrf_token }}
+			{{ form.username }} 
+			{{ form.password }} 
+			{{ form.submit }}
+		</form>
+	</body>
+</html>
