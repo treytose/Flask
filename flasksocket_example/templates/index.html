@@ -1,0 +1,51 @@
+<html>
+<head>
+</head>
+<body>
+	<h3> Flask Socket-IO Example </h3>
+	<h5> Dependencies </h5>
+	<ul>
+		<li> JavaScript -  socket.io.min.js </li>
+		<li> Python - flask-socketio </li>
+	</ul>
+	
+	<input id="roomID" type="text" placeholder="Enter room ID"/>
+	<button type="button" onclick="join()"> Join Room </button>
+
+	<div>
+		<ul id="messageBox">
+
+		</ul>
+	</div>
+	<div>
+		<input type="text" id="message">
+		<button type="button" onclick="sendMessage();"> Send </button>
+	</div>
+
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+
+	<script>
+		var socket = io.connect('http://' + document.domain + ':' + location.port);
+		socket.on('connect', function() {
+	        console.log('Connected');
+	    });
+
+
+		/* Message recieves data from socket.send() by default - unnamed event*/
+	    socket.on('message', function(msg) { 
+	    	document.getElementById("messageBox").innerHTML += '<li>' + msg + '</li>';
+	    });
+
+		function join() { 
+			socket.emit('join', document.getElementById("roomID").value);
+		}
+
+		function sendMessage() { 
+			var msgInput = document.getElementById("message");
+			var msg = msgInput.value;
+			msgInput.value = '';
+			socket.send(msg);
+		}
+	</script>
+</body>
+</html>
