@@ -1,0 +1,123 @@
+<html>
+
+<head>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"> </script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js"> </script>	
+	<style> 
+		body { 
+			background: gray;
+		}
+		.musicRow .col-sm-1 { 
+			border: 1px solid black;
+			border-radius: 5px;
+			height: 350px;
+			background: #5d5d5d;
+	 	}
+
+	 	.uploadRow .col-sm-1 { 
+	 		padding: 0px 1px;
+	 	}
+
+	 	@keyframes playing { 
+	 		from {background: red;}
+	 		to {background: blue;}
+	 	}
+	 	.playing { 
+	 		animation-name: playing;
+	 		animation-duration: 1s;
+	 		animation-iteration-count: infinite;
+	 		animation-direction: alternate;
+	 	}
+	</style>
+</head>
+	
+<body>
+	<div class="container-fluid">
+		{% for a in range(3) %}
+			<div class="row musicRow">
+				{% for i in range(1, 13) %}
+					<div style="padding: 0px;" id="slot{{i * (a+1)}}"  slot={{i * (a+1)}} class="col-sm-1"> 
+						{% for j in json %}
+							{% if j[0] == i * (a+1) %} <p style="color: white; transform: rotate(90deg); margin-top: 100px;" title="{{j[1]}}"> {{ j[1] }} </p> {% endif %}
+						{% endfor %}
+					</div>
+				{% endfor %}
+			</div>
+			<div class="row uploadRow">
+				{% for i in range(1,13) %}
+					<div class="col-sm-1"> <button type="button" onclick="$('#formSlot').val({{i * (a+1)}});" class="btn btn-info form-control" data-toggle="modal" data-target="#myModal"> Upload </button> </div>
+				{% endfor %}
+			</div>
+		{% endfor %}
+		<div id="myModal" class="modal fade" role="dialog">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h4 class="modal-title">Upload Sound File</h4>
+		      </div>
+		      <div class="modal-body">
+		      	<form method="POST" action="/upload" enctype=multipart/form-data>
+		      		<div class="form-group">
+				    	<input type="file" class="form-control-file" name=file>
+				    	<input id="formSlot" type="number" name=slot style="display: none;">
+				    </div>
+				    <div class="form-group">
+				    	<button type="submit" class="btn btn-default"> Submit </button>
+				    </div>
+		      	</form>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+	</div>
+
+	{% for j in json %}
+		<audio id="audio{{j[0]}}" controls style="display: none;">
+ 			<source src="{{url_for('static', filename='sounds/' + j[1]) }}">
+		</audio>
+	{% endfor %}
+
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+
+	<script>
+		var playing = [false, false, false, false, false, false, false, false, false, false, false, false];
+		document.querySelectorAll(".musicRow .col-sm-1").forEach(function(column) { 
+			column.addEventListener("click", function() { 
+				if(this.classList.contains("playing")) { 
+					this.classList.remove("playing");
+				} else { 
+					this.classList.add("playing");
+				}
+			});
+		});
+
+		$(".musicRow .col-sm-1").on("click", function() { 
+			var slot = $(this).attr("slot");
+			var audio = document.getElementById("audio" + slot);
+			if(playing[slot]) { 
+				audio.pause();
+				audio.currentTime = 0;
+			} else { 
+				audio.loop = true;
+				audio.play();
+			}
+			playing[slot] = !playing[slot];
+		});
+
+	</script>
+
+	<script>
+		var socket = io.connect('http://' + document.domain + ':' + location.port);
+		socket.on('connect', function() {
+	        console.log('Connected');
+	    });
+
+	</script>
+</body>
+
+</html>
