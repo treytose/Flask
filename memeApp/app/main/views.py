@@ -36,6 +36,10 @@ def share():
 	
 	return render_template('code.html', form=form, code=code, user=name, users=users)
 
+@main.route('/liveChat')
+def chat():
+	return render_template('liveChat.html')
+
 @socket.on('like')
 def like(id):
 	db = get_db()

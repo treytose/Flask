@@ -28,6 +28,7 @@ def create_app(config_name='default'):
 	from app.uwt import uwt as uwtBP
 	from app.coop import coopBP
 	from app.wordFall import wordFall as wfBP
+	from app.pong import pongBP
 
 	app.register_blueprint(mainBP)
 	app.register_blueprint(authBP, url_prefix='/auth')
@@ -35,5 +36,6 @@ def create_app(config_name='default'):
 	app.register_blueprint(uwtBP, url_prefix='/uwt')
 	app.register_blueprint(coopBP)
 	app.register_blueprint(wfBP)
+	app.register_blueprint(pongBP, url_prefix='/pong')
 
 	return app

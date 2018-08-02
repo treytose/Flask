@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% block head %}
+	<style type="text/css">
+		input[type=text], input[type=submit] {
+			border-radius: 8px;
+			padding: 12px 20px;
+			margin: 8px 0;
+			box-sizing: border-box;
+		}
+		body {
+			background: #1a1a1a;
+			color: white;
+		}
+		pre {
+			background: none;
+			color: white;
+			border: none;
+		}
+		code { 
+			color: white;
+			background: none;
+		}
+		.block { 
+			width: 100%;
+			height: 250px;
+			padding: 12px 20px;
+			box-sizing: border-box;
+			border: 2px solid #ccc;
+			border-radius: 4px;
+			background-color: #f8f8f8;
+			font-size: 16px;
+			resize: none;
+			margin-bottom: 10px;
+			color: black;
+		}
+		.in-black {
+			color: black;
+		}
+		.code-block { 
+			border-radius: 4px;
+			border: 1px solid gray;
+			margin-bottom: 5px;
+			margin-top: 0px;
+			padding-top: 0px;
+			padding-left: 20px;
+			padding-bottom: 10px;
+			white-space: pre-wrap;
+		}
+		.p-title {
+			margin: 0px;
+			background: gray;
+			border-radius: 10px;
+			color: black;
+			width: 150px;
+			padding: 5px;
+			float: left;
+			margin: 10px;
+		}
+		.code-block code { 
+			margin: 0px;
+			padding: 0px;
+		}
+		#message {
+			color: white;
+			border-radius: 8px;
+			background: black;
+		}
+		
+		.share-button { 
+			border: none;
+			background: gray;
+		}
+		textarea {
+			resize: none;
+		}
+		
+	</style>
+{% endblock %}
+{% block nav %}
+{% endblock %}
+{% block content %}
+	<div class="container-fluid">
+		<div class="text-center">
+			<p id="users"> Users: 
+			{% for u in users %}
+				<span id="{{u[0]}}">{{u[0]}},  </span>
+			{% endfor %}
+			</p>
+		</div>	
+			<div class="col-sm-12">
+				<form>
+					<p class="text-center"> Messages </p> 
+					 <label class="checkbox-inline">
+					  <input type="checkbox" id="notify"> Notifications
+					</label>
+				</form>
+				<div style="height: 80%; overflow: auto;" id="chat">
+					
+				</div>
+				<div class="form-horizontal" autocomplete="off">
+					<div class="input-group">
+						{# <input id="message" class="form-control"> #}
+						<textarea placeholder="Type your message..." class="form-control" id="message" rows="1" cols="73"> </textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+		<script type="text/javascript" charset="utf-8">
+		var socket = io.connect('http://' + document.domain + ':' + location.port);
+		var count = 0;
+		var notifyOn = false;
+		var notifyAudio = new Audio("{{url_for('static', filename='sound/alert.wav') }}");
+		// verify our websocket connection is established
+		socket.on('connect', function() {
+			console.log('Websocket connected!');
+			socket.emit('join_room', '0');
+		});
+		
+		socket.on('message', function(msg) {
+			$("#chat").append("<p style='white-space: pre; word-wrap: break-word;'>" + msg + "<br> </p>");
+			count++;
+			
+			if(count > 19) {
+				$("#chat").children()[0].remove();
+				count--;
+			}
+			
+			if(notifyOn) { 
+				notifyAudio.play();
+			}
+			
+			var chat = document.getElementById("chat");
+			chat.scrollTop = chat.scrollHeight;
+		});
+		
+		socket.on('like', function(id, likes) {
+			$("#post" + id).html("Likes: " + likes);
+		});
+
+		socket.on('user_joined', function(name) {
+			if($("#" + name).length == 0) {
+				$("#users").append("<span id='" + name + "'> " + name + "</span>");
+			}
+
+		});
+
+		socket.on('user_left', function(name) {
+			$("#" + name).remove();
+		});
+		
+		function sendMessage(message=$("#message").val()) {
+		  $("#message").val("");
+		  $("#message").selectionEnd= $("#message").selectionEnd + 7;
+		  socket.emit('message', message);
+		}
+		
+		$("#message").on("keypress", function(event) {
+			if(event.which == 13 && !event.shiftKey) { 
+				sendMessage();
+				event.preventDefault();
+			}
+		});
+		
+		
+		$("#notify").on("change", function() {
+			notifyOn = $("#notify").prop("checked");
+		});
+		
+		 window.onbeforeunload = function() {
+			socket.emit('leave');
+		 };
+		 
+		 $("#spinButton").on("click", function() {
+
+			sendMessage(`\<script\> (function myLoop (i) { setTimeout(function () {   
+				  	$("div, span, p, h1, h2, h3, h4, h5, h6, a").css({'transform': 'rotate(' + i + 'deg)'});
+				  if (--i + 1) myLoop(i);      //  decrement i and call myLoop again if i > 0
+			   }, 10)
+			})(360); \<\/script\>`);
+		 });
+
+			
+		$("#alerter").on("keypress", function(event) {
+			if(event.which == 13 && !event.shiftKey) { 
+				sendMessage('\<script\> alert("' + $('#alerter').val() + '"); \<\/script\>');
+				event.preventDefault();
+				$("#alerter").val("");
+			}
+		});
+		$("#imager").on("keypress", function(event) {
+			if(event.which == 13 && !event.shiftKey) { 
+				sendMessage('\<img src="' +  $('#imager').val() + '"\>');
+				event.preventDefault();
+				$("#imager").val("");
+			}
+		});
+
+		$("#videoer").on("keypress", function(){
+			if(event.which == 13 && !event.shiftKey) { 
+				sendMessage("<iframe width=500 height=500 src='" + $("#videoer").val() + "'> </iframe>");
+				$("#videoer").val("");
+			}
+		});
+		function like(id) {
+			socket.emit('like', id);
+		}
+
+		$("#inviteWFButton").on("click", function() {
+			sendMessage(`\<script\> if(confirm("Want to play Word Fall?")) { window.location = '/wordFall';} \<\/script\>`);
+		});
+
+		$("#nyanButton").on("click", function() {
+			sendMessage('\<iframe width="854" height="480" src="https://www.youtube.com/embed/wZZ7oFKsKzY?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen\>\<\/iframe\>');
+		});
+	  </script>
+{% endblock %}
