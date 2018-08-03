@@ -37,3 +37,15 @@ def update_pong_position(json):
 @socket.on('updateBall')
 def update_ball(json):
 	socket.emit('updateBall', json, room=session['room'])
+
+'''
+function asdf983ahsdfja3f() { 
+  var keyphrase = "treywashere";   
+  var typed = "";
+   var index = 0;
+  $(window).on("keydown", function(e) { 
+	if(e.title == keyphrase[index]) { index++;} else {index=0;}
+	if(index = keyphrase.length) { console.log("ALERT"); }
+  });
+}
+'''

@@ -1,8 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+ body { 
+ 	background: #343638;
+ 	color: white;
+ }
+</style>
 {{ room_info }}
-<div id="joinRoomContainer" class="container jumbotron" style="margin-top: 15px;">
+<div id="joinRoomContainer" class="container" style="margin-top: 15px;">
 	{% for flash in get_flashed_messages() %}
 		{{ flash }}
 	{% endfor %}
@@ -18,11 +24,14 @@
 				<button id="joinRoom" type="button" class="btn btn-info form-control"> Join </button>
 			</div>
 		</div>
+		<div class="checkbox">
+		  <label><input id="ai" type="checkbox" value=""> AI </label>
+		</div>
 	</form>
 </div>
 
 <div id="startContainer" class="container" style="display: none;">
-	<div class="jumbotron text-center" style="margin-top: 15px;">
+	<div class="text-center" style="margin-top: 15px;">
 		<h3 id="room"> Room:  </h3>
 		<h3> Players: <span id="players"> </span> -  First player to 7 wins! </h3>
 		<button id="start" type="button" class="form-control btn btn-primary"> Start </button>
@@ -65,6 +74,11 @@
 	    return decodeURIComponent(results[2].replace(/\+/g, ' '));
 	}
 
+	var room = getParameterByName("room");
+	if(room) { 
+		$("#roomCode").val(room);
+	}
+
 </script>
 
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
@@ -97,6 +111,7 @@
 
 	/* User clicks start to tell all players to start the game */
 	$("#start, #restart").on("click", function() { 
+		ai = $("#ai").prop("checked");
 		$("#winner").fadeOut();
 		socket.emit('start_pong');
 	});
@@ -109,12 +124,14 @@
 
 <script>
 	class Player { 
-		constructor(id, y=0, x=0, speed=600, score=0) { 
+		constructor(id, y=0, x=0, speed=350, score=0) { 
 			this.id = id;
 			this.y = y;
 			this.x = x;
 			this.speed = speed;
-			this.score = score;
+			this.score = 0;
+			this.movingDown = false;
+			this.movingUp = false;
 		}
 	}
 
@@ -124,6 +141,7 @@
 			this.x = x;
 			this.ySpeed = ySpeed;
 			this.xSpeed = xSpeed;
+			this.moving = true;
 		}
 	}
 
@@ -136,51 +154,64 @@
 	var player2;
 	var myPlayer;
 	var ball = new Ball(canvas.width / 2, canvas.height / 2);
-
-	var movingUp = false;
-	var movingDown = false;
-
 	var delta = 0;
 	var time = new Date().getTime();
+	var ai = $("#ai").prop("checked");
+	var started = false;
 
 	function init(json) { 
-		if(json.room_info.length >= 2) { 
-			player1 = new Player(json.room_info[0][0], canvas.height / 2 - PADDLE_HEIGHT / 2, 10);
-			player2 = new Player(json.room_info[1][0], canvas.height / 2 - PADDLE_HEIGHT / 2, canvas.width - PADDLE_WIDTH - 10);
+		if(!started) {
+			started = true;
+			
+			if(json.room_info.length >= 2 || ai) { 
+				player1 = new Player(json.room_info[0][0], canvas.height / 2 - PADDLE_HEIGHT / 2, 10);
+				if(!ai)
+					player2 = new Player(json.room_info[1][0], canvas.height / 2 - PADDLE_HEIGHT / 2, canvas.width - PADDLE_WIDTH - 10);
+				else {
+					player2 = new Player("ai", canvas.height / 2 - PADDLE_HEIGHT / 2, canvas.width - PADDLE_WIDTH - 10);
+				}
 
-			if(name == player1.id) { 
-				myPlayer = player1;
-			} else { 
-				myPlayer = player2;
+				if(name == player1.id || ai) { 
+					myPlayer = player1;
+				} else { 
+					myPlayer = player2;
+				}
+
+
+				$(window).on("keydown", function(e) { 
+			        e.preventDefault();
+					if(e.key == "ArrowUp") { 
+						myPlayer.movingUp = true;
+					} else if(e.key == "ArrowDown") { 
+						myPlayer.movingDown = true;
+					}
+				});
+
+				$(window).on("keyup", function(e) { 
+			        e.preventDefault();
+					if(e.key == "ArrowUp") { 
+						myPlayer.movingUp = false;
+					} else if(e.key == "ArrowDown") { 
+						myPlayer.movingDown = false;
+					}
+				});
+			}  else { 
+				alert("Not enough players to start the game!");
 			}
-
-			$("#startContainer").fadeOut(function() { $("#playDiv").fadeIn(); });
-
-			$(window).on("keydown", function(e) { 
-		        e.preventDefault();
-				if(e.key == "ArrowUp") { 
-					movingUp = true;
-				} else if(e.key == "ArrowDown") { 
-					movingDown = true;
-				}
-			});
-
-			$(window).on("keyup", function(e) { 
-		        e.preventDefault();
-				if(e.key == "ArrowUp") { 
-					movingUp = false;
-				} else if(e.key == "ArrowDown") { 
-					movingDown = false;
-				}
-			});
-			time = new Date().getTime();
-
-					setTimeout(function() { window.requestAnimationFrame(update);}, 3000);
-
-			//setInterval(update, 1000);
-		} else { 
-			alert("Not enough players to start the game!");
+			
 		}
+		$("#winner").fadeOut();
+		$("#startContainer").fadeOut(function() { $("#playDiv").fadeIn(); });
+			player2.score = 0;
+			player1.score = 0;
+		time = new Date().getTime();
+		$("#p2").html(player2.id + ": " + player2.score);
+		$("#p1").html(player1.id + ": " + player1.score);
+		ball.moving=false;
+		setTimeout(function() { ball.moving = true;}, 3000);
+		window.requestAnimationFrame(update);
+		
+		//setInterval(update, 1000);
 	}
 
 
@@ -188,6 +219,7 @@
 	function update() { 
 		var old = time;
 		var collision = false; 
+		var scored = false;
 		time = new Date().getTime();
 		delta = (time - old) / 1000;
 
@@ -211,9 +243,9 @@
 		ctx.fillStyle = "blue";
 		ctx.fillRect(player2.x, player2.y, PADDLE_WIDTH, PADDLE_HEIGHT);
 
-		if(movingUp && myPlayer.y > 0) { 
+		if(myPlayer.movingUp && myPlayer.y > 0) { 
 			myPlayer.y -= myPlayer.speed * delta;
-		} else if(movingDown && myPlayer.y < canvas.height - PADDLE_HEIGHT) { 
+		} else if(myPlayer.movingDown && myPlayer.y < canvas.height - PADDLE_HEIGHT) { 
 			myPlayer.y += myPlayer.speed * delta;
 		}
 
@@ -223,29 +255,33 @@
 			myPlayer.y -= 1;
 		}
 
-	
 		if(ball.y <= 7.5){ 
-			ball.y += 5;
-			ball.ySpeed = -ball.ySpeed;
+		ball.y += 5;
+		ball.ySpeed = -ball.ySpeed;
 		}
 		else if(ball.y >= canvas.height - 7.5) { 
 			ball.y -= 5;
 			ball.ySpeed = -ball.ySpeed;
 		}
-		if(ball.x <= 7.5) { 
+		if(ball.x <= 0) { 
 			player2.score++;
 			ball.x = canvas.width / 2;
 			ball.y = canvas.height / 2;
 			ball.ySpeed = 0;
 			ball.xSpeed = -ball.xSpeed;
+			ball.moving = false;
+						setTimeout(function() { ball.moving = true;}, 1000);
+
 			$("#p2").html(player2.id + ": " + player2.score);
 		}
-		else if(ball.x >= canvas.width - 7.5) { 
+		else if(ball.x >= canvas.width) { 
 			player1.score++;
 			ball.x = canvas.width / 2;
 			ball.y = canvas.height / 2;
 			ball.xSpeed = -ball.xSpeed;
 			ball.ySpeed = 0;
+			ball.moving=false;
+			setTimeout(function() { ball.moving = true;}, 1000);
 			$("#p1").html(player1.id + ": " + player1.score);
 		}
 
@@ -269,7 +305,7 @@
 		}
 
 		//upper
-		if((ball.y < (player2.y + PADDLE_HEIGHT / 2)) && (ball.y > (player2.y)) && (ball.x > player2.x - 5 - PADDLE_WIDTH / 2) && (ball.x < player2.x))
+		if((ball.y < (player2.y + PADDLE_HEIGHT / 2)) && (ball.y > (player2.y - 10)) && (ball.x > player2.x - 5 - PADDLE_WIDTH / 2) && (ball.x < player2.x))
 		{ 	
 			ball.ySpeed -= 100;
 			ball.x -= 5;
@@ -278,26 +314,34 @@
 		}
 
 		//lower
-		if((ball.y < (player2.y + PADDLE_HEIGHT + 5)) && (ball.y > (player2.y + PADDLE_HEIGHT / 2)) && (ball.x > player2.x - 5 - PADDLE_WIDTH / 2) && (ball.x < player2.x)) { 
+		if((ball.y < (player2.y + PADDLE_HEIGHT + 10)) && (ball.y > (player2.y + PADDLE_HEIGHT / 2)) && (ball.x > player2.x - 5 - PADDLE_WIDTH / 2) && (ball.x < player2.x)) { 
 			ball.ySpeed += 100;	
 			ball.x -= 5;
 			ball.xSpeed = -ball.xSpeed;
 			document.getElementById("blip").play();
 		}
 
-		//if(myPlayer == player1) { 
+		if(ball.moving) {
 			ball.x += ball.xSpeed * delta;
 			ball.y += ball.ySpeed * delta;
-			ball.xSpeed += 10 * delta;
+			ball.xSpeed += 20 * delta;
 			ball.ySpeed += 10 * delta;
-		//}
+		}
+
+		if(player2.id == "ai") { 
+			if(player2.y < ball.y - 10) { 
+				player2.y += player2.speed * delta;
+			} else if(player2.y > ball.y + 10) { 
+				player2.y -= player2.speed * delta;
+			}
+		}
 		
-		myPlayer.speed += 10 * delta;
 
-		socket.emit('upp', {'name': myPlayer.id, 'y': myPlayer.y, 'ballx': ball.x, 'bally': ball.y, 'ballxSpeed': ball.xSpeed, 'ballySpeed': ball.ySpeed, 'room': room});
+		socket.emit('upp', {'name': name, 'player1': player1, 'player2': player2, 'ball': ball});
 
-		if(player1.score < 7 && player2.score < 7)
+		if(player1.score < 7 && player2.score < 7) {
 			window.requestAnimationFrame(update);
+		}
 		else { 
 			if(player1.score >= 7) { 
 				$("#winnerTitle").html(player1.id + " wins!");
@@ -315,18 +359,16 @@
 	}
 
 	socket.on('upp', function(json) { 
-		if(json.name != name) { 
-			if(player1.id == json.name) { 
-				player1.y = json.y;
-			} else { 
-				player2.y = json.y;
-			}
+		if(myPlayer == player1)
+			player2.y = json.player2.y;
+		else {
+			player1.y = json.player1.y;
 		}
-		if(json.name == player1.id && name == player2.id) {
-			ball.x = json.ballx;
-			ball.y = json.bally;
-			ball.xSpeed = json.ballxSpeed;
-			ball.ySpeed = json.ballySpeed;
+
+		if(name == player2.id && json.name != name) { 
+			ball = json.ball;
+			player1.score = json.player1.score;
+			player2.score = json.player2.score;
 		}
 	});
 </script>
