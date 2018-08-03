@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block head %}
+		<style>
+			body {
+				background: #1a1a1a;
+				color: white;
+			}
+		</style>
+{% endblock %}
+{% block content %}
+	<div class="content">
+		<div style="width: 35%">
+			<h3> Active Games </h3>
+			<ul style="list-style: none;">
+				{% for item in chessList %}
+					<li> {{loop.index}}. <a target="_blank" style="color: white;" href="{{item[0]}}"> {{item[0]}} </a> </li>
+				{% endfor %}
+			</ul>
+			<div>
+				<form method="POST" action="/play">
+					{{ form.csrf_token }}
+					{{ form.url.label }} {{ form.url(size=20) }}
+					{{ form.submit }}
+				</form>
+			</div>
+		</div>
+		<div style="margin: auto; text-align: center;" >
+			<iframe style="margin: auto; width: 80%; height: 80%;" {% if url %} src="{{url}}" {% else %}  src="https://lichess.org/setup/friend" {% endif %}> </iframe>
+		</div>
+	
+	</div>
+{% endblock %}

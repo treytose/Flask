@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-sm-6">
+			<textarea rows="47" class="form-control" id="input"> {{text}}</textarea>
+		</div>
+		<div class="col-sm-6" id="editor">
+			{# <iframe id="editFrame" style="width: 100%; height:100%; float: right;" src="/coopEdit"> </iframe> #}
+
+		</div>
+	</div>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+		
+	<script>
+		var socket = io.connect('http://' + document.domain + ':' + location.port);
+		var lastRefresh = new Date().getTime();
+		var lastUpdate = 0;
+
+		socket.on('connect', function() {
+			console.log('Websocket connected!');
+			socket.emit('join_coop', 'Let me in!');
+		});
+		
+		$(document).delegate('#input', 'keydown', function(e) {
+			var keyCode = e.keyCode || e.which;
+
+		  if (keyCode == 9) {
+			e.preventDefault();
+			var start = this.selectionStart;
+			var end = this.selectionEnd;
+
+			// set textarea value to: text before caret + tab + text after caret
+			$(this).val($(this).val().substring(0, start)
+						+ "\t"
+						+ $(this).val().substring(end));
+		  }
+		});
+		
+		socket.on('update', function(text) {
+			if(new Date().getTime() - lastUpdate > 10000)  {
+				$("#input").val(text);
+				$("#editor").html(text);
+			}
+		});
+		
+		$("#input").on("keyup", function() {
+			$("#editor").html($("#input").val());
+			update();
+		});
+	
+		function update() {
+			socket.emit('update', $("#input").val());
+		}
+	</script>
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block head %}
+	<style>
+		.play {
+			color: white;
+			background: #18171c;
+		}
+	</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid text-center" style="height: 100%;">
+	<div id="join">
+		<br>
+		<div class="container jumbotron">
+			<input id="room" type="text" class="form-control" placeholder="Enter room ID" value="default">
+			<br>
+			<button type="button" class="btn btn-primary" id="joinRoom"> Join Room </button>
+		</div>
+	</div>
+	<div id="play" style="display: none;">
+		<br>
+		<div id="message"> </div>
+		<button type="button" id="start" class="btn btn-success"> Start </button>
+		<div class="pull-right">
+			<p style="margin-right: 30px;"> Players: </p>
+			<ul id="nameList">
+
+			</ul>
+		</div>
+		<input id="wordInput" style="position: fixed; bottom: 15; width: 50%; left: 25%;" type="text" class="form-control" >
+	</div>
+</div>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script>
+	var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+	var nameList = [];
+	var players = {
+
+	}
+	var present = setInterval(function() {
+		socket.emit('present');
+	}, 1000);
+	socket.on('connect', function() {
+		console.log('Websocket connected!');
+	});
+	socket.on('message', function(msg){
+		console.log(msg);
+	});
+	socket.on('joined_wf', function(name){
+		if(!(nameList.includes(name))){ 
+			nameList.push(name);
+			players[name] = 0;
+			$("#nameList").empty();
+			for(var i = 0; i < nameList.length; i++) {
+				$("#nameList").append("<li style='margin-right:35px;'>" + nameList[i] + "</li>");
+			}
+		}
+	
+	});
+
+	socket.on('start_wf', function(msg){
+		start();
+		clearInterval(present);
+	});
+
+
+
+	socket.on('scored', function(name, points) {
+		if(!(nameList.includes(name))){ 
+			nameList.push(name);
+			players[name] = points;
+			$("#nameList").empty();
+			for(var i = 0; i < nameList.length; i++) {
+				$("#nameList").append("<li style='margin-right:35px;'>" + nameList[i] + "</li>");
+			}
+		}
+	
+		players[name] += parseInt(points);
+		if(players[name] >= 500) {
+			socket.emit('winner', name);
+		}
+		$("#nameList").empty();
+		for(var i = 0; i < nameList.length; i++) {
+			
+			$("#nameList").append("<li style='margin-right:35px;'>" + nameList[i] + ": " + players[nameList[i]] + "</li>");
+		}
+	});
+
+	socket.on('winner', function(msg) {
+		$("#play").html(`<h1> ${msg} <h1> <br> <a href='/wordFall'> Play Again </a>`);
+	});
+
+	$("#joinRoom").on("click", function(){
+		if($("#room").val() != "") {
+			socket.emit('join_wordFall', $("#room").val());
+			$("#join").fadeOut(500, function(){
+				$("#play").fadeIn();
+				$("body").addClass("play");
+			});
+		}
+
+	});	
+
+	$("#start").on("click", function(){
+		socket.emit('start_wf', 'start');
+	});
+
+	function start(){
+		$("#start").fadeOut();
+		$("#message").html("<h1> Starting in 5 </h1>");
+		var timer = setInterval(countdown, 1000);
+		var i = 5;
+		function countdown() {
+			i--;
+			$("#message").html("<h1> Starting in " + i + " </h1>");
+			if(i == 0) {
+				clearInterval(timer);
+				$("#message").empty();
+				setInterval(function(){
+					socket.emit('move_word')
+				}, 1500);
+			}
+		}
+
+	}
+
+	socket.on('move_word', function(word) {
+		moveWord(word);
+	});
+
+	var wordList = [];
+	
+
+	function moveWord(text) {
+		var duration = getRandomInt(5000) + 3000;
+		var word = document.createElement("h3");
+		$(word).html(text);
+		wordList.push(text);
+		$("#play").append(word);
+		$(word).css({"position": "absolute", "left": getRandomInt(1700)});
+		$(word).animate({"bottom": "-10"}, duration,"linear", function(){
+			$(word).remove();
+			//wordList = wordList.splice(wordList.indexOf(text) + 1);
+			wordList = wordList.filter(w => w != text);
+			//socket.emit('remove_word', word);
+		});
+	}
+
+	socket.on('remove_word', function(word) {
+		removeWord(word);
+	})
+
+	function removeWord(word) {
+		var els = $("#play").children();
+		$.each(els, function(idx, val) {
+			if($(val).html() == word) {
+				$(val).remove();
+			}
+		});
+		wordList = wordList.filter(w => w != word);
+	//	wordList = wordList.splice(wordList.indexOf(word) + 1);
+	//	console.log(wordList);
+	}
+
+	$("#wordInput").on("keyup", function(e) {
+		var word = $("#wordInput").val();
+		if(wordList.includes(word)) {
+			socket.emit('scored', word.length, word);
+			
+			$("#wordInput").val("");
+		}
+	});
+
+	function getRandomInt(max) {
+	  return Math.floor(Math.random() * Math.floor(max));
+	}
+</script>
+{% endblock %}

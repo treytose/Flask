@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% block head %}
+	<style type="text/css">
+		body {
+			background: #1a1a1a;
+		}
+		img {
+			border-radius: 3px;
+			border: 3px solid white;
+			display: block;
+			margin: 40px auto;
+		}
+		.switch {
+		  position: relative;
+		  display: inline-block;
+		  width: 60px;
+		  height: 34px;
+		}
+
+		.switch input {display:none;}
+
+		.slider {
+		  position: absolute;
+		  cursor: pointer;
+		  top: 0;
+		  left: 0;
+		  right: 0;
+		  bottom: 0;
+		  background-color: #ccc;
+		  -webkit-transition: .4s;
+		  transition: .4s;
+		}
+
+		.slider:before {
+		  position: absolute;
+		  content: "";
+		  height: 26px;
+		  width: 26px;
+		  left: 4px;
+		  bottom: 4px;
+		  background-color: white;
+		  -webkit-transition: .4s;
+		  transition: .4s;
+		}
+
+		input:checked + .slider {
+		  background-color: #2196F3;
+		}
+
+		input:focus + .slider {
+		  box-shadow: 0 0 1px #2196F3;
+		}
+
+		input:checked + .slider:before {
+		  -webkit-transform: translateX(26px);
+		  -ms-transform: translateX(26px);
+		  transform: translateX(26px);
+		}
+
+		/* Rounded sliders */
+		.slider.round {
+		  border-radius: 34px;
+		}
+
+		.slider.round:before {
+		  border-radius: 50%;
+		}
+		.upload-div {
+			color: white;
+			margin: 40px auto;
+			display: block;
+			text-align: center;
+		}
+		.btn-default {
+			background: #fff;
+			color: #333;
+			border-color: #ccc;
+		}
+		.btn {
+			display: inline-block;
+			padding: 6px 12px;
+			margin-bottom: 0;
+			font-size 14px;
+			font-weight: 400;
+			line-height: 1.42857;
+			white-space: nowrap;
+			vertical-align: middle;
+			border-radius: 4px;
+		}
+		.chat-div {
+			right: 0px;
+			position: absolute;
+			display: inline;
+			color: white;
+			margin-top: 0px;
+		}
+		.chat-div p {
+			line-height: 0.5;
+		}
+		.notifications-div {
+			display: inline;
+		}
+		.web-div {
+			text-align: center;
+			margin: 40px auto;
+		}
+	</style>
+{% endblock %}
+{% block content %}
+	<div class="content">
+		<div class="notifications-div">
+			<h3 style="color: white;" > Notifications </h3>
+			<label class="switch">
+			  <input id="notifications" type="checkbox">
+			  <span class="slider round"></span>
+			</label>
+		</div>
+		<div>
+				<img id="image" src="#"/>
+		</div>
+		<div class="upload-div">
+			<h1>Upload an Educational Photo For Educational Purposes</h1>
+			<form method=post enctype=multipart/form-data>
+			  <input style="margin: 5px auto;" class="btn btn-default" type=file name=file>
+			  <input class="btn btn-default" type=submit value=Upload>
+			</form>
+		</div>
+		<hr>
+		<div class="web-div">
+			<iframe id="iframe" width="854" height="480" src="https://www.youtube.com/embed/fAIX12F6958" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+		</div>
+	</div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"> </script>
+	<script>
+		var last = "";
+		var lastWeb = "";
+		var audio = new Audio("{{url_for('static', filename='sound/alert.wav') }}");
+
+		function doPoll(){
+			$.get('/imageCheck', function(data) {
+				if(data != last && document.getElementById('notifications').checked) {
+					audio.play();	
+				}
+				last = data;
+				$("#image").prop('src', '/static/images/' + data);
+				setTimeout(doPoll,10000);
+			});
+			$.get('/webCheck', function(data) {
+				console.log(data);
+				if(data != lastWeb) {
+					$("#iframe").prop('src', data);
+					lastWeb = data;
+					if(document.getElementById('notifications').checked) {
+						audio.play();	
+					}
+				}
+			});
+		}
+		doPoll();
+	</script>
+{% endblock %}
