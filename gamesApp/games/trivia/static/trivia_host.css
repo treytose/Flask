@@ -1,0 +1,72 @@
+body {
+  background: #2980b9;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #2c3e50, #2980b9);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #2c3e50, #2980b9); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+h1 {
+  color: white;
+  font-size: 6vw;
+  margin-top: 20px;
+}
+
+h2 {
+  font-size: 4vw;
+}
+
+h2, h3, h4, h5, h6 {
+  color: white;
+}
+
+.list-group-item {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 3vw;
+  text-align: left;
+  border-bottom: 1px solid black;
+  margin-bottom: 7px;
+  margin-top: 7px;
+}
+
+.success {
+  background: #11998e;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #38ef7d, #11998e);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #38ef7d, #11998e); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.danger {
+  background: #200122;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #6f0000, #200122);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #6f0000, #200122); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.progress {
+    margin-bottom: 10px;
+    height: 10vw;
+    padding: 0px 0px;
+    background: none;
+}
+.bar {
+    width: 1%;
+    height: 10vw;
+    background-color: green;
+}
+
+.user-image {
+  width: 5vw;
+  height: 7vw;
+}
+
+@media screen and (max-width: 780px) {
+  h1 {
+    font-size: 14vw;
+  }
+  h2 {
+    font-size: 8vw;
+  }
+  .list-group-item {
+    font-size: 6vw;
+  }
+}

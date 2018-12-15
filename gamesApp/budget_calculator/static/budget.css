@@ -1,0 +1,22 @@
+
+.jumbotron {
+  font-family: fantasy;
+}
+
+@media screen and (min-width: 1200px) {
+  #outputList {
+    position: fixed;
+    bottom: 5px;
+    right: 10px;
+  }
+  #outputList
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}

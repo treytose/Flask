@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='index.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='libs/font-awesome.min.css')}}">
+
+  <script src="{{url_for('static', filename='libs/font-awesome.js')}}"> </script>
+
+{% endblock %}
+
+{% block body %}
+  <div class="container">
+    <div class="jumbotron">
+      <div class="form-title">
+        <h2 class="text-center"> Welcome to Treytose.com</h2>
+        <hr>
+      </div>
+
+      {% if flashes %} <p class="flash"> {{ flashes[0] }} </p> {% endif %}
+      <form method="POST" action="/login">
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i></span>
+          <input type="text" class="form-control" placeholder="Username" name="username" required>
+        </div>
+        <div class="input-group margin-bottom-sm">
+          <span class="input-group-addon"><i class="fa fa-unlock-alt" aria-hidden="true"></i></span>
+          <input type="password" class="form-control" placeholder="Password" name="password" required>
+        </div>
+        <div class="input-group">
+          <button type="submit" class="btn btn-default btn-block"> Sign In </button>
+        </div>
+      </form>
+
+      <div class="notice">
+        <p> New users click <a href="/register"> here </a> to register</p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

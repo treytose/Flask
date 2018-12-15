@@ -1,0 +1,58 @@
+body {
+  color: white;
+}
+
+button {
+  margin-top: 40px;
+}
+
+.btn-default {
+  background-color: #000428;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #004e92, #000428);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #004e92, #000428);
+  border: None;
+  padding: 12px 20px;
+  color: white;
+  width: 80%;
+}
+
+.btn-default:active {
+  background: #000428;
+  color: white;
+}
+
+.btn-default:hover{
+  background-color: #000428;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to bottom, #004e92, #000428);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to bottom, #004e92, #000428);
+  border: 2px solid white;
+  color: white;
+}
+
+h1 {
+  font-size: 6vw;
+  color: white;
+}
+
+h3 {
+  color: white;
+  font-size: 4vw;
+}
+
+.container div p {
+  font-size: 1vw;
+}
+
+.hostContent, .joinContent, .waitingRoom {
+  display: none;
+  margin: 0px auto;
+}
+
+#roomCodeInput {
+  height: 80px;
+  margin: 10px auto;
+  width: 400px;
+  font-size: 60px;
+  text-transform: uppercase;
+
+}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% import 'macros.html' as macros %}
+
+{% block head %}
+<link rel="stylesheet" href="{{url_for('trivia.static', filename='trivia_lobby.css')}}">
+{% endblock %}
+
+{% block body %}
+  {{ macros.navbar('Games', username=username)}}
+
+  <div class="container text-center" id="selectionDiv">
+    <div class="row">
+      <div class="col-sm-12">
+        <button type="button" class="btn btn-default btn-block" id="hostButton"> Host </button>
+      </div>
+      <div class="col-sm-12">
+        <button type="button" class="btn btn-default btn-block" id="joinButton"> Join </button>
+      </div>
+    </div> {# end of row #}
+    <h3> The <b>Host</b> device will display the questions, answers, and scores for all players to see. </h3>
+    <h3> Click the <b>Join</b> option to connect to a hosted lobby. </h3>
+  </div>
+
+  <div class="container text-center" id="joinDiv" style="display: none;">
+    <h1> Welcome </h1>
+    <hr>
+    <input placeholder="Room Code" type="text" id="roomCodeInput" class="form-control largeInput text-center" maxlength=4>
+    <input placeholder="Team Name" type="text" id="teamName" class="form-control largeInput text-center">
+    <button type="button" class="btn btn-default btn-block" id="roomCodeSubmit"> Enter </button>
+    <br>
+    <h4> caution: only those with high IQ's will be able to play this game </h4>
+  </div>
+
+  <div class="container text-center" id="joinDiv2" style="display: none;">
+    <h1> Players </h1>
+    <hr>
+    <ul class="list-group" id="playerList1">
+
+    </ul>
+    <div class="text-center" id="firstPlayerDiv">
+      <button type="button" class="btn btn-default" id="allInButton"> Begin </button>
+    </div>
+  </div>
+
+  <div class="container text-center" id="hostDiv" style="display: none;">
+    <div class="container text-center">
+      <h1> Room Code: <span id="roomCode"> </span> </h1>
+      <hr>
+      <ul class="list-group" id="playerList2">
+
+      </ul>
+    </div>
+
+  </div>
+
+
+  <script src="{{url_for('trivia.static', filename='trivia_lobby.js')}}"> </script>
+{% endblock %}

@@ -1,3 +1,6 @@
+# Run with gunicorn --worker-class eventlet -b 0.0.0.0:80 -w 1 manage:app
+
+
 from flask import g
 from app import create_app, socket
 app = create_app()
@@ -13,4 +16,4 @@ def close_connection(exception):
 
 if __name__ == '__main__':
 	#app.run(host='0.0.0.0', port=5001)
-	socket.run(app, host='0.0.0.0', port=5001)
+	socket.run(app, host='0.0.0.0', port=80)

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% import 'macros.html' as macros %}
+
+{% block head %}
+<link rel="stylesheet" href="{{url_for('games.static', filename='LQ/gameBoard.css')}}">
+{% endblock %}
+
+{% block body %}
+{{ macros.navbar('Games', username )}}
+
+<div class="container-fluid text-center">
+  <div class="row">
+    <div class="col-sm-1">
+
+    </div>
+    <div class="col-sm-8 mainContent">
+      <h1 class="title"> Loaded Questions </h1>
+      <hr>
+      <br>
+
+
+
+
+      {#------------Asker-----------------#}
+      <div class="asker">
+        <div id="asker-Question">
+
+        </div>
+        <div id="asker-wait">
+
+        </div>
+        <div id="asker-choose">
+
+        </div>
+      </div>
+
+      {#------------Reader-----------------#}
+      <div class="reader">
+
+      </div>
+
+      {#------------Player-----------------#}
+      <div class="player">
+
+
+      </div>
+    </div>
+
+    <div class="col-sm-3 questionsColumn">
+      <br>
+      <div class="question">
+        <h3> Name the best feature of the person on your right </h3>
+      </div>
+      <div class="question">
+        <h3>A</h3>
+      </div>
+      <div class="question">
+        <h3> B</h3>
+      </div>
+      <div class="question">
+        <h3> C</h3>
+      </div>
+      <div class="question">
+        <h3>D </h3>
+      </div>
+      <div class="question">
+        <h3> Name the best feature of the person on your right </h3>
+      </div>
+      <div class="question">
+        <h3> Name the best feature of the person on your right </h3>
+      </div>
+      <div class="question">
+        <h3> Name the best feature of the person on your right </h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{url_for('games.static', filename='LQ/gameBoard.js')}}"> </script>
+{% endblock %}

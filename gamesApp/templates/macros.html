@@ -1,0 +1,44 @@
+{% macro navbar(active_page, username=None, fixed=False) %}
+
+{% set page_titles = [('Home', '/dashboard'), ('Games', '/games'), ('Budget Calculator', '/budget')] %}
+
+<nav class="navbar navbar-default {% if fixed %} navbar-fixed-top {% endif %}">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-left"> <img id="brandImage" height="38" width="32" src="{{url_for('static', filename='images/Logo1.png')}}"> </img></a>
+      <a class="navbar-brand"> </a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        {% for page,href in page_titles %}
+        {% if page == active_page %}
+        <li class="active"><a href="{{ href }}"> {{ page }} </a></li>
+        {% else %}
+        <li><a href="{{ href }}"> {{ page }} </a></li>
+        {% endif %}
+        {% endfor %}
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        {% if username %}
+        <li> <p class="navbar-text"> Signed in as <strong> {{ username }} </strong> </p> </li>
+        {% endif %}
+        <li><a href="#" onclick="$('.signOutForm').submit()"> Sign Out </a> </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<form class="signOutForm" action="/logout" method="POST"> </form>
+
+{% endmacro %}

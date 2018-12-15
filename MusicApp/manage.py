@@ -11,4 +11,4 @@ def close_connection(exception):
 		db.close()
 
 if __name__ == '__main__':
-	socket.run(app, host='0.0.0.0', port=5001, debug=True)
+	socket.run(app, host='0.0.0.0', port=80, debug=True)

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% import 'macros.html' as macros %}
+
+{% block head %}
+<link rel="stylesheet" href="{{url_for('trivia.static', filename='trivia_player.css')}}">
+{% endblock %}
+
+{% block body %}
+  {{ macros.navbar('Games', username=username)}}
+
+  <div class="container text-center" id="welcomeDiv">
+    <h1> Welcome to Trivia! </h1>
+  </div>
+
+  <div class="container text-center" id="stage1" style="display: none;">
+    <h1> Trivia </h1>
+    <hr>
+    <h2> Waiting for the question<span class="ellipsis-anim"><span>.</span><span>.</span><span>.</span></span> </h2>
+  </div>
+
+
+  <div class="container text-center" id="stage2" style="display: none;">
+    <h1> Trivia </h1>
+    <hr>
+    <h3 id="question">  </h3>
+    <ul class="list-group" id="answerList">
+
+
+    </ul>
+    <button type="button" class="btn btn-default btn-block" id="answerSubmit"> Submit </button>
+  </div>
+
+
+  <div class="container text-center" id="stage3" style="display: none;">
+    <h1> Trivia </h1>
+    <hr>
+    <h2> Waiting for everyone to answer<span class="ellipsis-anim"><span>.</span><span>.</span><span>.</span></span> </h2>
+  </div>
+
+  <div class="container text-center" id="stage4" style="display: none;">
+    <h1> Trivia </h1>
+    <hr>
+    <div id="message1">
+      <h2> </h2>
+    </div>
+    <div id="message2" style="display: none;">
+      <h2> The correct answer is: <span id="correctAnswer"> </span> </h2>
+      <ul class="list-group" id="answerRevealList">
+
+
+      </ul>
+    </div>
+  </div>
+
+  <div class="container text-center" id="gameOverStage" style="display: none;">
+    <br>
+    <button type="button" class="btn btn-default btn-block" id="playAgainButton"> Play Again? </button>
+    <br>
+    <button type="button" class="btn btn-default btn-block" id="donePlayingButton"> Exit </button>
+  </div>
+  <script src="{{url_for('trivia.static', filename='trivia_player.js')}}"> </script>
+{% endblock %}

@@ -1,0 +1,51 @@
+body {
+  background-color: #392c2f;
+}
+
+.form-title {
+  margin-bottom: 32px;
+}
+form div  {
+  margin: 12px auto;
+  width: 85%;
+}
+
+.jumbotron {
+  margin: 40px auto;
+  width: 40%;
+  min-height: 400px;
+  color: white;
+  font-size: 12px!important;
+  background: #000428;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #004e92, #000428);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #004e92, #000428); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+.notice, .flash {
+  margin: 32px auto;
+  width: 85%;
+}
+.jumbotron p {
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.btn-default {
+  background: #DC2424;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #4A569D, #DC2424);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #4A569D, #DC2424); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  color: white;
+  border-color: black;
+}
+
+.btn-default:hover {
+  color: white;
+}
+
+
+@media screen and (max-width: 980px) {
+    .jumbotron {
+        width: 100%;
+    }
+}

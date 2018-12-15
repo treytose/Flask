@@ -1,0 +1,104 @@
+h1 {
+  color: white;
+}
+
+.row {
+  margin-top: 40px;
+}
+.d2 {
+  height: 200px;
+  border: solid 2px black;
+  padding-left: 0px;
+
+}
+
+.d3 {
+  height: 400px;
+  border: solid 2px black;
+
+}
+
+.d4 {
+  height: 200px;
+  border: solid 2px black;
+}
+
+
+.d1 {
+  height: 800px;
+  border: solid 2px black;
+}
+
+#mainContainer {
+  margin-bottom: 40px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+input[type='number'] {
+    -moz-appearance:textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+/* ---- Weather ------ */
+.weatherDiv {
+  background: #56CCF2;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #2F80ED, #56CCF2);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #2F80ED, #56CCF2); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  padding-top: 10px;
+}
+#weatherTitle, #timestamp {
+  color: white;
+  margin: 5px 10px;
+
+}
+#temperature {
+  color: white;
+  font-family: sans-serif;
+  font-size: 60px;
+  margin: auto auto;
+}
+#feelsLike {
+  font-size: 20px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin-right: 30px;
+  margin-bottom: 10px;
+  color: white;
+  font-family: sans-serif;
+}
+#condition {
+  float:right;
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin-right: 30px;
+  color: white;
+  margin-top: 10px;
+}
+
+#zipDiv {
+  position: absolute;
+  bottom: 0;
+  width: 25%;
+  margin-left: 0px;
+}
+#zipCode {
+  position: absolute;
+  bottom: 0;
+  width: 70%;
+  margin-left: 0px;
+}
+#zipSubmit {
+  float: right;
+  width: 30%;
+}

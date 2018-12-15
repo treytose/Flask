@@ -1,0 +1,25 @@
+.gameButtons img{
+	margin-top: 15px;
+}
+
+div.desc {
+  padding: 15px;
+  text-align: center;
+}
+
+h3{
+    color: white;
+}
+
+.img-thumbnail{
+   max-height: 400px;
+}
+
+.gameImage {
+	height: 400px;
+	width: 600px;
+	border: 2px solid white;
+}
+.highlighted{
+    opacity: 0.7;
+}

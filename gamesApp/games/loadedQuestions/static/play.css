@@ -1,0 +1,225 @@
+body {
+  background: #6441A5;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #2a0845, #6441A5);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #2a0845, #6441A5); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  color: white;
+}
+
+.askerDiv, .askerPhase1, .askerPhase2, .askerPhase3,
+.readerDiv, .readerPhase1, .readerPhase2, .readerPhase3, .readerPhase4,
+.playerDiv, .playerPhase1, .playerPhase2, .playerPhase3, .playerPhase4,
+.betweenRoundsDiv {
+  display: none;
+}
+
+.btn-default {
+  width: 25vw;
+  height: 10vh;
+  font-size: 2vw;
+}
+
+.largeInput {
+  height: 10vh;
+  font-size: 3vw;
+  margin-top: 5px;
+}
+
+.largeButton {
+  height: 10vh;
+  font-size: 2vw;
+  margin-top: 5px;
+}
+
+.list {
+  background: #000000;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #434343, #000000);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #434343, #000000); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  color: white;
+  font-size: 20px;
+  border: none;
+  margin-bottom: 2px;
+}
+
+.scoreBoardList {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2vw;
+}
+
+.addon {
+  padding-left: 0px;
+  background: white;
+  color: black;
+}
+
+#mainColumn {
+  position: fixed;
+}
+#rightColumn {
+  float: right;
+}
+
+#scoreBoardButton, #newCards{
+  background: #41295a;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #2F0743, #41295a);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #2F0743, #41295a); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  height: 7vh;
+  width: 100%;
+  color: white;
+  border: none;
+  margin-bottom: 10px;
+}
+#scoreBoardButton:hover, #newCards:hover{
+  background: #200122;
+}
+
+.modal-header, .modal-body {
+  background: #41295a;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #2F0743, #41295a);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #2F0743, #41295a); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+
+.card {
+  background: #141E30;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #243B55, #141E30);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #243B55, #141E30); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  color: white;
+  width: 100%;
+  float: right;
+  border-color: #141E30;
+  margin-bottom: 2px;
+  cursor: pointer;
+}
+
+.card:hover{
+  background: #141E30;
+}
+
+
+@media only screen and (max-width: 620px) {
+  #title {
+    font-size: 10vw;
+  }
+  .btn-default {
+    width: 27vw;
+    height: 10vh;
+    font-size: 4vw;
+  }
+
+  .largeInput {
+    height: 10vh;
+    font-size: 5vw;
+  }
+
+  .responsiveFont  {
+    font-size: 4vw;
+  }
+
+  .largeButton {
+    height: 10vh;
+    font-size: 4vw;
+    margin-top: 5px;
+    width: 51vw;
+  }
+  .scoreBoardList {
+    font-size: 6vw;
+  }
+
+
+}
+
+@media only screen and (max-width: 900px) {
+  #mainColumn {
+    position: relative;
+  }
+  #rightColumn {
+    float: center;
+  }
+}
+
+.ellipsis-anim span {
+    opacity: 0;
+    -webkit-animation: ellipsis-dot 1s infinite;
+    animation: ellipsis-dot 1s infinite;
+}
+
+.ellipsis-anim span:nth-child(1) {
+    -webkit-animation-delay: 0.0s;
+    animation-delay: 0.0s;
+}
+.ellipsis-anim span:nth-child(2) {
+    -webkit-animation-delay: 0.1s;
+    animation-delay: 0.1s;
+}
+.ellipsis-anim span:nth-child(3) {
+    -webkit-animation-delay: 0.2s;
+    animation-delay: 0.2s;
+}
+
+@-webkit-keyframes ellipsis-dot {
+      0% { opacity: 0; }
+     50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+@keyframes ellipsis-dot {
+      0% { opacity: 0; }
+     50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+/*
+  Enter the room
+  need: whats is my role?
+    getJSON(get_info) contains role
+
+  role = asker
+    prompt instructions. choose a question or type a custom one  - Phase 1 - Question
+    prompt custom input, and submit card/custom buttons
+
+    submit card/custom button clicked:                           - Phase 2 - Waiting for answers
+      tell server that question was asked.
+      prompt waiting for answers indication
+      poll server for allAnswersIn
+
+    once all answers are in:                                     - Phase 3 - Guessing Stage
+      prompt instructions- listen to the reader and match the answers to the correct players
+      reader handles the rest.
+      poll server for next turn, get new role.
+
+
+    role = reader
+      waiting for asker to ask a question:                        - Phase 1 - Waiting for asker
+        poll the server for questionAsked and get the question
+
+      once question has been recieved:                            - Phase 2 - Answering and polling for other player answers
+        prompt question
+        prompt answer input:
+          reader types in answer and sends it to the server
+
+        reader polls server for all player answers:
+          creates a list of all player answers to be read to the reader.
+
+      once all answers are in:                                    - Phase 3 - Taking score and telling the server
+        prompt instructions - read answers to the asker, asker matches answers to players,
+                              take count of how many the asker chose correctly.
+        prompt score input for asker
+        send to server the score the asker recieved - 1 point per correct match.
+        Tell server time for the next turn
+        poll server for nextTurn, get new role.
+
+
+      role = player
+      waiting for asker to ask a question:                        - Phase 1 - Waiting for asker
+        poll the server for questionAsked and get the question
+
+      once question has been recieved:                            - Phase 2 - Answering and polling for other player answers
+        prompt question
+        prompt answer input:
+
+      once all answers are in:                                    - Phase 3 - Taking score and telling the server
+        prompt instructions - wait for asker to match you to an answer, if its correct show a thumbs up
+        poll server for nextTurn, get new role
+
+*/

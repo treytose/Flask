@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% import 'macros.html' as macros %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{url_for('budget.static', filename='budget.css')}}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"> </script>
+{% endblock %}
+
+{% block body %}
+  {{ macros.navbar('Budget Calculator', username=username) }}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-8">
+        <div class="container">
+          <br>
+          <div class="jumbotron col-sm-8">
+            <h1> 40% Budget Calculator </h1>
+            <p> The 40% Budget is a budget based around the idea that you are only allowed to spend up to 40% of your monthly budget on loan payments (car, house, student loans, etc.)
+              Note that the 40% budget does NOT include the necessity expenses.  </p>
+            <form class="form-horizontal">
+              <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#incomeDiv"> Income </button>
+              <div id="incomeDiv" class="collapse in">
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="netIncome"> Net Income </label>
+                  <div class="col-sm-6">
+                    <input id="netIncome" type="number" placeholder="Net Income (After Taxes)" class="form-control">
+                  </div>
+                </div>
+              </div>
+              <br>
+      {# NECESSITY #}
+              <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#necDiv"> Necessities </button>
+              <div id="necDiv" class="collapse in">
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="grocery"> Grocery </label>
+                  <div class="col-sm-6">
+                    <input id="grocery" type="number" placeholder="Grocery" class="form-control" value="400">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="carGas"> Car Gasoline </label>
+                  <div class="col-sm-6">
+                    <input id="carGas" type="number" placeholder="Car Gasoline" class="form-control" value="100">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="electricity"> Electricity </label>
+                  <div class="col-sm-6">
+                    <input id="electricity" type="number" placeholder="Electricity" class="form-control" value="170">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="gas"> Natural Gas </label>
+                  <div class="col-sm-6">
+                    <input id="gas" type="number" placeholder="Gas" class="form-control" value="75">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="water"> Water and Trash </label>
+                  <div class="col-sm-6">
+                    <input id="water" type="number" placeholder="Water" class="form-control" value="60">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="internet"> Internet </label>
+                  <div class="col-sm-6">
+                    <input id="internet" type="number" placeholder="internet" class="form-control" value="75">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="other"> Other </label>
+                  <div class="col-sm-6">
+                    <input id="other" type="number" placeholder="other" class="form-control" value="75">
+                  </div>
+                </div>
+              </div> {# end of nec div #}
+              <br>
+      {# CAR #}
+              <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#carDiv"> Car </button>
+              <div id="carDiv" class="collapse in">
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="carPrice">Total Car Price </label>
+                  <div class="col-sm-6">
+                    <input id="carPrice" type="number" placeholder="Car Price" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="carInsurance"> Car Insurance </label>
+                  <div class="col-sm-6">
+                    <input id="carInsurance" type="number" placeholder="Car Insurance" class="form-control" value="75">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="carLoanTerm"> Loan Term (months) </label>
+                  <div class="col-sm-6">
+                    <input id="carLoanTerm" type="number" placeholder="Loan Term (months)" class="form-control" value="36">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="carDownPayment"> Down Payment </label>
+                  <div class="col-sm-6">
+                    <input id="carDownPayment" type="number" placeholder="Down Payment" class="form-control" value="0">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="carInterestRate"> Interest Rate (Percent) </label>
+                  <div class="col-sm-6">
+                    <input id="carInterestRate" type="number" placeholder="Interest Rate (Percent)" class="form-control" value="5">
+                  </div>
+                </div>
+              </div>
+              <br>
+      {# HOUSE #}
+              <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#houseDiv"> House </button>
+              <div id="houseDiv" class="collapse in">
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="housePrice"> Total Home Price </label>
+                  <div class="col-sm-6">
+                    <input id="housePrice" type="number" placeholder="Total Home Price" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="houseInsurance"> Home Insurance </label>
+                  <div class="col-sm-6">
+                    <input id="houseInsurance" type="number" placeholder="Home Insurance" class="form-control" value="50">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="houseLoanTerm"> Loan Term (Years) </label>
+                  <div class="col-sm-6">
+                    <input id="houseLoanTerm" type="number" placeholder="Loan Term Years)" class="form-control" value="15">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="houseDownPayment"> Down Payment </label>
+                  <div class="col-sm-6">
+                    <input id="houseDownPayment" type="number" placeholder="Down Payment" class="form-control" value="0">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="houseInterestRate"> Interest Rate </label>
+                  <div class="col-sm-6">
+                    <input id="houseInterestRate" type="number" placeholder="Interest Rate" class="form-control" value="4.5">
+                  </div>
+                </div>
+              </div>
+              <hr>
+      {# Savings #}
+            <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#savingsDiv"> Savings </button>
+            <div id="savingsDiv" class="collapse in">
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="savings"> Savings Per Month </label>
+                <div class="col-sm-6">
+                  <input id="savings" type="number" placeholder="Savings Per Month" class="form-control" value="0">
+                </div>
+              </div>
+            </div>
+      {# Buttons #}
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <button id="calculate" type="button" class="form-control btn btn-primary"> Calculate </button>
+                </div>
+             {#
+                <div class="col-sm-6">
+                  <button type="button" class="form-control btn btn-primary"> How much car can I afford with this house? </button>
+                </div>
+             #}
+              </div>
+            </form>
+
+            <canvas id="canvas">  </canvas>
+
+          </div> {# End of JumboTron #}
+        </div>
+      </div> {# End Column #}
+
+      <div class="col-sm-4" id="outputList">
+
+        <div class="jumbotron">
+          <h4> Total Monthly Budget: <span id="totalMonthlyBudget"> </span> </h4>
+          <h3 data-toggle="tooltip" title="Tooltip"> Total 40% Budget: <span id="totalFortyBudget"> </span> </h3>
+          <hr>
+          <h4> Total Necessity Bill: <span id="totalNecessityBill"> </span></h4>
+          <h4> Total Car Payment: <span id="totalCarPayment"> </span></h4>
+          <h4> Total House Payment: <span id="totalHousePayment"> </span></h4>
+          <hr>
+          <div id="summary" class="alert alert-success">
+            <h4> 40% Budget: <span id="FortyBudget"> </span> </h4>
+            <h3> Total Leftover Monthly: <span id="totalLeftover"> </span></h3>
+          </div>
+        </div>
+      </div>
+    </div> {# End Row #}
+
+
+  </div>
+
+  <script src="{{url_for('budget.static', filename='budgetCalculator.js')}}"> </script>
+
+{% endblock %}

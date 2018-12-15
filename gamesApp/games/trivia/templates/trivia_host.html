@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% import 'macros.html' as macros %}
+
+{% block head %}
+<link rel="stylesheet" href="{{url_for('trivia.static', filename='trivia_host.css')}}">
+{% endblock %}
+
+{% block body %}
+  <div class="container text-center" id="welcomeDiv">
+    <h1> Welcome to Trivia! </h1>
+    <hr>
+    <h2> How to Play </h2>
+    <h3> Step 1: Answer the questions correctly </h3>
+
+    <h3> Good luck! </h3>
+
+  </div>
+
+  <div class="container text-center" id="incomingQuestion" style="display: none;">
+    <h1> Trivia </h1>
+    <hr>
+    <h2> Next Question in <span id="questionTimer"> </span> Seconds! </h2>
+  </div>
+
+  <div class="container text-center" id="stage1"  style="display: none;">
+    <h1> Trivia </h1>
+    <hr>
+    <h2 id="question"> </h2>
+    <div class="row">
+      <div class="col-sm-1">  </div>
+      <div class="col-sm-10">
+        <ul class="list-group" id="answerList">
+
+        </ul>
+        <h2> <span id="answerTimer"> </span> seconds left! </h2>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="container text-center" id="stage2" style="display: none;">
+    <h1> Trivia </h1>
+    <hr>
+    <div id="message1">
+      <h2> All answers are in! </h2>
+    </div>
+    <div id="message2" style="display: none;">
+      <h2> The correct answer is: <span id="correctAnswer"> </span> </h2>
+      <ul class="list-group" id="answerRevealList">
+
+
+      </ul>
+    </div>
+  </div>
+
+  <div class="container text-center" id="stage3" style="display: none;">
+    <h1> Trivia </h1>
+    <hr>
+    <div id="scoreboard">
+
+    </div>
+  </div>
+
+  <div class="container text-center" id="winnerStage" style="display: none;">
+    <h1> <span id="winnerLabel"> </span> has won the game! </h1>
+    <img src="{{url_for('trivia.static', filename='congrats.gif')}}">
+  </div>
+
+  <div class="container text-center" id="tieStage" style="display: none;">
+    <h1> Tie Game! </h1>
+
+  </div>
+
+
+  <audio id="introAudio" autoplay>
+    <source src="{{url_for('trivia.static', filename='audio/introduction.wav')}}">
+  </audio>
+  <audio id="letsGetStarted">
+    <source src="{{url_for('trivia.static', filename='audio/lets_get_started.wav')}}">
+  </audio>
+  <audio id="everyone_answered">
+    <source src="{{url_for('trivia.static', filename='audio/everyone_answered.wav')}}">
+  </audio>
+  <audio id="jeopardy">
+    <source src="{{url_for('trivia.static', filename='audio/jeopardy_theme.mp3')}}">
+  </audio>
+  <audio id="nextQuestion">
+    <source src="{{url_for('trivia.static', filename='audio/next_question.wav')}}">
+  </audio>
+  <audio id="winnerAudio">
+    <source src="{{url_for('trivia.static', filename='audio/winnerAudio.wav')}}">
+  </audio>
+  <audio id="tieAudio">
+    <source src="{{url_for('trivia.static', filename='audio/tieAudio.wav')}}">
+  </audio>
+  <script src="{{url_for('trivia.static', filename='trivia_host.js')}}"> </script>
+{% endblock %}

@@ -1,4 +1,7 @@
 #!/usr/bin/python3.6
+
+#Run with: gunicorn -w 4 -b 0.0.0.0:80 manage:app
+
 import os
 from app import create_app, db
 from app.models import User, Role

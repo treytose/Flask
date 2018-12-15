@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% import 'bootstrap/wtf.html' as wtf %}
+{% import "_macros.html" as macros %}
 
 {% block content %}
 <div class="container">
@@ -15,6 +16,18 @@
   {% if flashes %}
     {{ flashes[0] }}
   {% endif %}
+
+  {% if current_user.can(Permission.WRITE_ARTICLES) %}
   {{ wtf.quick_form(form) }}
+  {% endif %}
+  <hr>
+  {% include "_posts.html" %}
+  {{ macros.pagination_widget(pagination, '.index') }}
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ moment.include_moment() }}
+{{ pagedown.include_pagedown() }}
 {% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='index.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='libs/font-awesome.min.css')}}">
+
+  <script src="{{url_for('static', filename='libs/font-awesome.js')}}"> </script>
+  <script src='https://www.google.com/recaptcha/api.js'></script>
+  <style>
+.g-recaptcha {
+  margin: 0 300px 0px 0px;
+  width: 204px;
+}
+</style>
+
+
+{% endblock %}
+
+{% block body %}
+  <div class="container">
+    <div class="jumbotron">
+      <div class="form-title">
+        <h2 class="text-center"> Welcome to Treytose.com</h2>
+        <hr>
+      </div>
+
+      {% if flashes %} <p class="flash"> {{ flashes[0] }} </p> {% endif %}
+      <form method="POST" action="/register">
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i></span>
+          <input type="text" class="form-control" placeholder="Username" name="username" required>
+        </div>
+        <div class="input-group margin-bottom-sm">
+          <span class="input-group-addon"><i class="fa fa-unlock-alt" aria-hidden="true"></i></span>
+          <input type="password" class="form-control" placeholder="Password" name="password" required id="password">
+          <input type="password" class="form-control" placeholder="Confirm Password" name="confirmPassword" required id="confirmPassword">
+        </div>
+        <div class="input-group">
+          <button type="submit" class="btn btn-default btn-block"> Register </button>
+        </div>
+        <div id="captcha">
+          <div class="g-recaptcha" style="transform:scale(0.87);-webkit-transform:scale(0.87);transform-origin:0 0;-webkit-transform-origin:0 0;" data-sitekey="6LerdTwUAAAAAFJzv-Y9tAK7NC9Cq-08rFtgT81Z"></div>
+        </div>
+      </form>
+
+      <div class="notice">
+        <p> Already have an account? Click <a href='/'> here </a> to sign in. </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var password = document.getElementById("password")
+    , confirm_password = document.getElementById("confirmPassword");
+
+    function validatePassword(){
+    if(password.value != confirm_password.value) {
+      confirm_password.setCustomValidity("Passwords Don't Match");
+    } else {
+      confirm_password.setCustomValidity('');
+    }
+    }
+
+    password.onchange = validatePassword;
+    confirm_password.onkeyup = validatePassword;
+  </script>
+{% endblock %}

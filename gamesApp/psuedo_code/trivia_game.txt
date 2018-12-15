@@ -1,0 +1,124 @@
+
+
+
+Designate 1 screen to display the question and multiple choice answers called the host screen
+3 or more players will gather in the same room with the host screen.
+
+The host screen will tell the server to start a countdown from 30
+Players have 30 seconds to submit their answers.
+Once everyone has submitted an answer or the timer ends the host screen shows who answered what
+The host screen reveals the correct answer
+the host screen shows each players place on the board
+  all players start at the bottom of the Screen
+  the players move up everytime they gain a point
+  when a player reaches the top the win
+  if two players reach the top at the same time. Do a tie breaker.
+  PS: Show a dumb and dumber picture next to the player in last place, and an albert einsten picture to the player in first.
+
+
+
+Front-End
+Host Screen:
+  __init__:
+    Display a Room Code
+    Poll the server to find everyone in the Room
+    Once the first player hits "everyone's in":
+      Welcome the players
+      Explain the rules (option to skip?)
+
+  GameLoop:
+    Display a Question along with x multiple choice answers
+    After 5 seconds to allow players to read the question, Tell server to start countdown from 30
+    Poll server to find out if all players have answered
+    Once all_players_answered or countdown == 0:
+      Display "Times up" or "All answers are in!"
+      Display who answered what
+      Reveal the correct answer
+      Show the scoreboard
+
+
+
+Player-Screens:
+  Clicks join a Room
+  Types in room Code
+  Waits for other players to enter and "everybody's in" to be clicked
+  Waits for intro to complete
+  Polls server to ask when to display the answers
+  Sends answer to server
+  waits for other players to answer or time to run Out
+
+
+
+Server Side:
+  __init__:
+    read a csv file with question,answer,fakeanswer,fakeanswer,fakeanswer
+        with open(question.csv) as f:
+          answ.append(f.readline().split(','))
+
+        answ looks like: [[question, answer,fake1, fake2, fake3], ...]
+    shuffle the question list:
+      random.shuffle(answ)
+
+    rooms = {room_code: room()} #clients will send requests with the /<room_code>
+
+
+  Someone clicks the host button:
+    calls server create_room():
+      Create a Room(random_room_code) with a room code
+      Return the room Code to the host
+
+  First player to join clicks everyone_in button:                               !
+    tell all players the game has started
+    #players load in to the gameboard.html
+
+  the host calls the server for a Question:                                     !
+     get a question,answer,... from the questions_list                          !
+     tell the room[room_code] the current question and current_answer:
+      add all answers to an answerList
+      shuffle the answer_list
+     return the first question and its answers from the question_list to the client
+
+  the host calls the server telling it to start a timer for x seconds:
+    start a timer countding down from x seconds.
+
+    players submit their answers:
+      room.submit_answer(user, answer):
+          for l in answer_list:
+            if l.contains(user.id):
+              l.answer = answer
+              if answer == self.current_answer:
+                l.answerCorrect = True
+                l.score += 1
+              else:
+                l.answerCorrect = False
+
+
+    host polls the server asking for the current time and if all_answers_are_in, all_answers_are_in if len(room.answer_list) == len(room.players)
+    If the currentTime <= 0 or all_answers_are_in it will stop polling.
+
+    host polls for room info to get player scores and player answers:
+      call new_round on room:
+        reset answerList, playerAnswers, playerAnswerCorrect
+
+
+    host tells server that its time for the next round:
+      room.gameStarted = false  #to tell the players to move to the next round.
+
+    players are polling the server to ask when the next round starts.
+
+
+class Room:
+  room_code = ABCD
+  players = [] {user.id, user.username, score, answer, answerCorrect}
+  current_question = current_question
+  current_answer = current_correct_answer
+  answer_list = [list of all answers to current_question]
+  room_info = {gameStarted, players, answer_list, question}
+
+  def new_round():
+    for p in players:
+      p[answerCorrect] = False
+      p[answer] = None
+
+  def ask_question(self, question):
+    self.current_question = question[0]

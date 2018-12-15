@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% import 'macros.html' as macros %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{url_for('games.static', filename='games.css')}}">
+{% endblock %}
+{% block body %}
+
+
+{{ macros.navbar('Games', username) }}
+<div class="container">
+  	<div class="row">
+  		<div class="col-md-6 text-center">
+  			<h3> Guess the RGB Color </h3>
+  			<img class="img-responsive gameImage" src="{{url_for('games.static', filename='colorsPicture.png')}}" alt="Colors Game"/>
+  		</div>
+      <div class="col-md-6 text-center">
+  			<h3> Hunter Jump Is Bad 1 </h3>
+  			<img class="img-responsive gameImage" src="{{url_for('games.static', filename='jumpManGame.png')}}" alt="JumpMan Game"/>
+  		</div>
+
+      <div class="col-md-6 text-center">
+        <h3> Loaded Questions </h3>
+        <img class="img-responsive gameImage" src="{{url_for('games.static', filename='loadedQuestionsLogo.png')}}" alt="Loaded Questions"/>
+      </div>
+
+      <div class="col-md-6 text-center">
+        <h3> Generic Trivia </h3>
+        <img class="img-responsive gameImage" src="{{url_for('games.static', filename='TriviaLogo.png')}}" alt="Generic Trivia"/>
+      </div>
+
+      <div class="col-md-6 text-center">
+        <h3> Cowtown Cowboy </h3>
+        <img class="img-responsive gameImage" src="{{url_for('games.static', filename='CowtownCowboy.PNG')}}" alt="CowtownCowboy"/>
+      </div>
+  	</div>
+
+  </div>
+  </div>
+  <br>
+  <script src="{{url_for('games.static', filename='games.js')}}"> </script>
+{% endblock %}

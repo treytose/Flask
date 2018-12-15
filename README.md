@@ -1,2 +1,4 @@
 # Flask
-Flask Notes and References
+This repository contains various web applications for learning/reference and for fun. 
+
+Created with flask. 

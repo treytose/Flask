@@ -1,0 +1,55 @@
+body {
+  background: #DC2424;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #4A569D, #DC2424);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #4A569D, #DC2424); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  font-family: 'Raleway', sans-serif;
+}
+
+
+/* Navbar Styling */
+
+.navbar-default{
+  background: #000428;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #004e92, #000428);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #004e92, #000428); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  border-color: #000428;
+  border-radius: 0px;
+  margin: 0;
+}
+
+.navbar-default .navbar-nav > li > a, .navbar-default .navbar-nav > li > p {
+  color: white;
+}
+
+.navbar-default .navbar-nav > li > a:hover {
+  color: #a2b8db;
+}
+
+.navbar-default .navbar-nav > .active > a {
+  color: white;
+  background-color: #325791;
+}
+
+.navbar-default .navbar-nav > .active > a:hover{
+  color: white;
+  background-color: #406eb7;
+}
+
+
+.navbar-default .navbar-brand {
+  color: #bfcae5;
+}
+
+.navbar-text {
+  margin-left: 15px;
+}
+
+#brandImage {
+  margin-top: 5px;
+}
+
+.navbar-text strong {
+  text-transform: capitalize;
+}
+
+/* End Navbar Styling */

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% import 'macros.html' as macros %}
+
+{% block head %}
+<link rel="stylesheet" href="{{url_for('loadedQuestions.static', filename='lobby.css')}}">
+{% endblock %}
+
+{% block body %}
+{{ macros.navbar('Games', username )}}
+<br>
+<br>
+
+<div class="container text-center playArea">
+  <div class="modeSelection">
+    <button id="hostButton" class="btn btn-default  btn-block">  Host a Game </button>
+    <br>
+    <button id="joinButton" class="btn btn-default  btn-block"> Join a Game  </button>
+  </div>
+
+  {# ------------------------------- Host ------------------------------------ #}
+  <div class="hostContent noDisplay">
+    <h1> Room Code: <span id="roomCode"> </span> </h1>
+    <button id="startButton" class="btn btn-default largeButton"> Everyone's in!  </button>
+    <h3> Players: </h3>
+    <ul class="list-group user-list" id="userList1">
+
+    </ul>
+  </div>
+
+{# --------------------------------- Join ------------------------------------ #}
+  <div class="joinContent noDisplay">
+    <form>
+     <div class="form-group">
+       <label for="roomCode"><h1> Enter Room Code </h1></label>
+       <hr>
+       <input required maxlength="4" id="roomCodeInput" type="text" class="form-control text-center largeInput">
+     </div>
+     <button id="roomCodeSubmit" type="button" class="btn btn-default btn-block">Enter</button>
+    </form>
+  </div>
+
+  <div class="waitingRoom noDisplay">
+    <h1> Waiting for host to start the match </h1>
+    <h3> Players: </h3>
+    <div>
+      <ul class="list-group user-list" id="userList2">
+
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script src="{{url_for('loadedQuestions.static', filename='lobby.js')}}"> </script>
+{% endblock %}

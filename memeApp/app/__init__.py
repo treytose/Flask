@@ -4,7 +4,7 @@ import sqlite3
 from flask_socketio import SocketIO
 
 
-DATABASE = '/home/olholthe/projects/appTest/data.db'
+DATABASE = '/root/Flask/memeApp/data.db'
 # declare extensions here #
 socket = SocketIO()
 
